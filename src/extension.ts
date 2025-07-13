@@ -1,14 +1,15 @@
 import * as vscode from 'vscode';
+import { ChatWebviewPanel } from './presentation/vscode/ChatWebviewPanel';
 
 export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "ai-punk" is now active!');
 
-	let disposable = vscode.commands.registerCommand('ai-punk.chat', () => {
-		vscode.window.showInformationMessage('AI Punk Chat opened!');
-	});
-
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(
+		vscode.commands.registerCommand('ai-punk.chat', () => {
+			ChatWebviewPanel.createOrShow(context.extensionUri);
+		})
+	);
 }
 
 export function deactivate() {} 
