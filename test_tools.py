@@ -15,6 +15,9 @@ from src.tools.edit_file import edit_file_tool
 from src.tools.delete_file import delete_file_tool
 from src.tools.run_terminal_cmd import run_terminal_cmd_tool
 from src.tools.grep_search import grep_search_tool
+from src.tools.file_search import file_search_tool
+from src.tools.search_replace import search_replace_tool
+from src.tools.codebase_search import codebase_search_tool
 from src.workspace import select_workspace
 
 def test_tools():
@@ -65,13 +68,28 @@ def test_function():
     result = run_terminal_cmd_tool.run(command="python --version")
     print(f"Результат: {result['success']}")
     
-    print("\n6. Тест delete_file:")
+    print("\n6. Тест file_search:")
+    print("-" * 20)
+    result = file_search_tool.run(query="test", max_results=5)
+    print(f"Результат: {result['success']}")
+    
+    print("\n7. Тест search_replace:")
+    print("-" * 25)
+    result = search_replace_tool.run(file_path="test_output.py", old_string="AI Punk", new_string="AI Punk v2", create_backup=False)
+    print(f"Результат: {result['success']}")
+    
+    print("\n8. Тест codebase_search:")
+    print("-" * 25)
+    result = codebase_search_tool.run(query="workspace management", target_directories=["src"])
+    print(f"Результат: {result['success']}")
+    
+    print("\n9. Тест delete_file:")
     print("-" * 20)
     result = delete_file_tool.run(path="test_output.py", force=True)
     print(f"Результат: {result['success']}")
     
     print("\n✅ Тестирование завершено!")
-    print(f"🎯 Реализовано инструментов: 6/9")
+    print(f"🎯 Реализовано инструментов: 9/9 (100%)")
 
 if __name__ == "__main__":
     test_tools() 
