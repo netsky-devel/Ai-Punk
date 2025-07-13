@@ -7,7 +7,7 @@ import { IAIAdapter } from '../../application/ports/IAIAdapter';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 
 export class LangChainAdapter implements IAIAdapter {
-    private _model: BaseChatModel;
+    private _model: BaseChatModel | undefined;
 
     constructor() {
         this._model = this.createModelFromSettings();
@@ -18,29 +18,47 @@ export class LangChainAdapter implements IAIAdapter {
         });
     }
 
-    private createModelFromSettings(): BaseChatModel {
+    private createModelFromSettings(): BaseChatModel | undefined {
         const config = vscode.workspace.getConfiguration('aiPunk');
         const provider = config.get<string>('aiProvider');
         
-        switch (provider) {
-            case 'Google':
-                return new ChatGoogleGenerativeAI({
-                    apiKey: config.get<string>('google.apiKey'),
-                    modelName: config.get<string>('google.model'),
-                });
-            case 'OpenAI':
-                 return new ChatOpenAI({
-                    apiKey: config.get<string>('openAI.apiKey'),
-                    modelName: config.get<string>('openAI.model'),
-                });
-            default:
-                throw new Error(`Unsupported AI provider: ${provider}`);
+        try {
+            switch (provider) {
+                case 'Google': {
+                    const apiKey = config.get<string>('google.apiKey');
+                    const model = config.get<string>('google.model');
+                    if (!apiKey || !model) {
+                        return undefined;
+                    }
+                    return new ChatGoogleGenerativeAI({ apiKey, model });
+                }
+                case 'OpenAI': {
+                     const apiKey = config.get<string>('openAI.apiKey');
+                     const modelName = config.get<string>('openAI.model');
+                     if (!apiKey || !modelName) {
+                        return undefined;
+                     }
+                     return new ChatOpenAI({ apiKey, modelName });
+                }
+                default:
+                    vscode.window.showWarningMessage(`AI Punk: Unsupported AI provider selected: ${provider}`);
+                    return undefined;
+            }
+        } catch (error: any) {
+            vscode.window.showErrorMessage(`Failed to create AI model: ${error.message}`);
+            return undefined;
         }
     }
 
     public async getCompletion(messages: Message[]): Promise<string> {
         if (!this._model) {
-            throw new Error("AI Model not initialized. Please check your settings.");
+            this._model = this.createModelFromSettings();
+        }
+
+        if (!this._model) {
+            const message = "AI provider, model, or API key is not configured. Please check AI Punk settings.";
+            vscode.window.showErrorMessage(message);
+            return message;
         }
 
         const history: BaseMessage[] = messages.map(msg => 
