@@ -1,41 +1,35 @@
-import { StructuredTool, ToolParams } from "langchain/tools";
-import { z } from "zod";
-import * as vscode from 'vscode';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import { DynamicTool } from "langchain/tools";
+import * as fs from "fs/promises";
+import * as path from "path";
+import { workspace } from "vscode";
 
-export class ListDirTool extends StructuredTool {
-    name = "list_dir";
-    
-    schema = z.object({
-        relative_workspace_path: z.string().describe("Path to list contents of, relative to the workspace root. Use an empty string to list the root directory.")
-    });
-
-    description = "List the contents of a directory. Useful to try to understand the file structure before diving deeper into specific files.";
-
-    constructor(params?: ToolParams) {
-        super(params);
-    }
-    
-    protected async _call({ relative_workspace_path }: z.infer<this["schema"]>): Promise<string> {
+export const listDirTool = new DynamicTool({
+    name: "list_dir",
+    description: "List the contents of a directory. The quick tool to use for discovery, before using more targeted tools like semantic search or file reading. Useful to try to understand the file structure before diving deeper into specific files. Can be used to explore the codebase.",
+    func: async (dirPath: string = "") => {
         try {
-            const workspaceFolders = vscode.workspace.workspaceFolders;
-            if (!workspaceFolders || workspaceFolders.length === 0) {
-                return "Error: No workspace folder is open.";
+            const rootPath = workspace.workspaceFolders?.[0]?.uri.fsPath;
+            if (!rootPath) {
+                return "Error: No workspace is open.";
             }
-            const rootPath = workspaceFolders[0].uri.fsPath;
-            const targetPath = path.join(rootPath, relative_workspace_path);
-
-            const items = await fs.readdir(targetPath, { withFileTypes: true });
-            const itemList = items.map(item => `${item.isDirectory() ? '[dir]' : '[file]'} ${item.name}`);
             
-            if(itemList.length === 0) {
-                return `Directory '${relative_workspace_path}' is empty.`;
+            const targetPath = dirPath ? path.resolve(rootPath, dirPath) : rootPath;
+            const entries = await fs.readdir(targetPath, { withFileTypes: true });
+            
+            const content = entries.map(entry => {
+                return entry.isDirectory() ? `${entry.name}/` : entry.name;
+            }).join('\n');
+
+            if (!content) {
+                return `Directory '${targetPath}' is empty.`;
             }
 
-            return `Contents of '${relative_workspace_path}':\n${itemList.join('\n')}`;
+            return `Contents of ${targetPath}:\n${content}`;
         } catch (error: any) {
+            if (error.code === 'ENOENT') {
+                return `Error: Directory not found at ${error.path}`;
+            }
             return `Error listing directory: ${error.message}`;
         }
     }
-} 
+}); 

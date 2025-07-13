@@ -8,14 +8,15 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
 
     // Use cases and adapters
+    public readonly aiAdapter: LangChainAdapter;
     private readonly _sendMessage: SendMessage;
     private readonly _conversationRepository: InMemoryConversationRepository;
     private _conversationId: string;
 
     constructor(private readonly _extensionUri: vscode.Uri) {
         this._conversationRepository = new InMemoryConversationRepository();
-        const aiAdapter = new LangChainAdapter();
-        this._sendMessage = new SendMessage(this._conversationRepository, aiAdapter);
+        this.aiAdapter = new LangChainAdapter();
+        this._sendMessage = new SendMessage(this._conversationRepository, this.aiAdapter);
         this._conversationId = this._conversationRepository.findActiveConversationId()!;
     }
 

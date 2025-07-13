@@ -37,6 +37,10 @@
       {
         "command": "ai-punk.chat.focus",
         "title": "Focus AI Punk Chat"
+      },
+      {
+        "command": "ai-punk.indexWorkspace",
+        "title": "AI Punk: Index Workspace"
       }
     ],
     "configuration": {
@@ -81,6 +85,7 @@
     "lint": "eslint src --ext ts"
   },
   "devDependencies": {
+    "@types/glob": "^8.1.0",
     "@types/node": "18.x",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
@@ -89,9 +94,12 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@langchain/community": "^0.3.48",
     "@langchain/core": "^0.3.62",
     "@langchain/google-genai": "^0.2.14",
     "@langchain/openai": "^0.5.18",
+    "faiss-node": "^0.5.1",
+    "glob": "^11.0.3",
     "langchain": "^0.3.29",
     "zod": "^3.25.76"
   }
