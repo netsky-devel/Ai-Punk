@@ -31,7 +31,19 @@ export class ChatWebviewPanel {
         // Handle messages from the webview
         this._panel.webview.onDidReceiveMessage(
             message => {
-                // Handle messages from webview
+                switch (message.type) {
+                    case 'sendMessage':
+                        // Echo message back to the webview
+                        this._panel.webview.postMessage({
+                            type: 'addMessage',
+                            data: { sender: 'user', text: message.data }
+                        });
+                        this._panel.webview.postMessage({
+                            type: 'addMessage',
+                            data: { sender: 'bot', text: `You said: ${message.data}` }
+                        });
+                        return;
+                }
             },
             null,
             this._disposables
@@ -87,17 +99,39 @@ export class ChatWebviewPanel {
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        // For now, a simple placeholder
+        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
+        const stylesUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'styles.css'));
+
+        const nonce = getNonce();
+
         return `<!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link href="${stylesUri}" rel="stylesheet">
                 <title>AI Punk</title>
             </head>
             <body>
-                <h1>AI Punk Chat</h1>
+                <div id="chat-container">
+                    <!-- Chat messages will be appended here -->
+                </div>
+                <div id="input-container">
+                    <textarea id="message-input" placeholder="Ask AI Punk..."></textarea>
+                    <button id="send-button">Send</button>
+                </div>
+                <script nonce="${nonce}" src="${scriptUri}"></script>
             </body>
             </html>`;
     }
+}
+
+function getNonce() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
 } 
