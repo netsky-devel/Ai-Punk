@@ -1,0 +1,11 @@
+node_modules
+dist
+.vscode
+*.vsix
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Agent memory
+.agent-context.md 
