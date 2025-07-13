@@ -1,11 +1,57 @@
-node_modules
-dist
-.vscode
-*.vsix
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
 
-# OS-specific
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Agent memory
-.agent-context.md 
+# Build outputs
+dist/
+build/
+*.egg-info/
+.tox/
+.coverage
+.pytest_cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# AI Punk specific
+.ai-punk/
+*.index
+*.faiss
+
+# Temporary files
+*.tmp
+*.temp
+.cache/ 

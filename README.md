@@ -1,130 +1,96 @@
-# AI Punk - Advanced VS Code AI Assistant
+# AI Punk
 
-AI Punk is an advanced autonomous AI assistant for VS Code with clean architecture and extended development capabilities.
+**Autonomous AI Coding Assistant with Full Process Transparency**
 
-## 🚀 Key Features
+## 🎯 Philosophy
 
-### Architecture
-- **Clean Architecture** with separated layers: Domain, Application, Infrastructure
-- **LangChain integration** for multiple AI providers
-- **Google Gemini and OpenAI** model support
-- **Semantic search** with FAISS vector indexes
+AI Punk is not just another AI assistant - it's an **autonomous agent** that shows you its complete thought process as it works. You'll see every decision, every tool usage, and every step of reasoning in real-time.
 
-### Autonomous AI Agent
-AI Punk provides advanced autonomous capabilities:
-- **Autonomous task completion** until full resolution
-- **Maximum context understanding** through multiple searches
-- **Multilingual support** - responds in user's language
-- **Smart tool usage** without mentioning tool names
-- **Thorough analysis** with symbol tracing to definitions
-- **Advanced code editing** capabilities
+### Key Principles
 
-### Complete Tool Set
+1. **🔍 Full Transparency** - See every thought, action, and observation
+2. **🤖 Autonomous Operation** - No permission asking, full automation  
+3. **🧠 Educational Experience** - Learn by watching the AI work
+4. **🌍 Multilingual Support** - Responds in your language
+5. **🏗️ Clean Architecture** - Domain-driven design principles
 
-#### Basic Tools
-- **list_dir** - explore project structure
-- **read_file** - read files with line range support
-- **edit_file** - create and edit files
-- **run_terminal_cmd** - execute terminal commands
+## 🚀 Features
 
-#### Advanced Tools
-- **codebase_search** - semantic code search
-- **grep_search** - precise regex pattern search
-- **file_search** - fast file search by name
-- **delete_file** - safe file deletion
-- **search_replace** - precise text replacement
+- **Real-time Process Visibility** - Watch the AI think and act
+- **Multi-step Task Execution** - Complex problem decomposition
+- **Tool Chaining** - Combines multiple tools for solutions
+- **Codebase Understanding** - Semantic search and analysis
+- **File System Operations** - Read, write, search, and manage files
+- **Terminal Integration** - Execute commands and see results
+- **Vector Search** - Semantic code search with embeddings
+- **Multiple AI Providers** - OpenAI, Google, Anthropic support
 
-## 📦 Installation
+## 📁 Project Structure
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd ai-punk
+```
+ai-punk/
+├── ai-punk-prompts.md       # System prompts and ReAct patterns
+├── ai-punk-tools.md         # Tool descriptions and usage
+├── ai-punk-architecture.md  # Clean architecture documentation
+└── README.md               # This file
 ```
 
-2. Install dependencies:
-```bash
-npm install
+## 🔧 Saved Components
+
+All key components from the previous implementation are preserved in markdown files:
+
+- **Prompts** (`ai-punk-prompts.md`) - Complete system prompts with transparency requirements
+- **Tools** (`ai-punk-tools.md`) - All 9 tools with descriptions and usage patterns  
+- **Architecture** (`ai-punk-architecture.md`) - Clean architecture layers and design patterns
+
+## 🎸 What Makes AI Punk Different
+
+### Traditional AI Assistants:
+```
+User: "Fix this bug"
+AI: "I fixed the bug. Here's the solution."
 ```
 
-3. Compile the project:
-```bash
-npm run compile
+### AI Punk:
+```
+User: "Fix this bug"
+AI: 
+Thought: I need to understand the codebase structure first
+Action: list_dir
+Action Input: "."
+Observation: Found these files: src/, tests/, package.json...
+
+Thought: Now I should look at the main source files
+Action: read_file  
+Action Input: "src/main.js"
+Observation: The file contains...
+
+Thought: I can see the bug is in line 45, let me fix it
+Action: edit_file
+Action Input: {"path": "src/main.js", "content": "..."}
+Observation: Successfully wrote to src/main.js
+
+Thought: Let me verify the fix works
+Action: run_terminal_cmd
+Action Input: "npm test"
+Observation: All tests passed!
+
+Final Answer: Bug fixed! The issue was...
 ```
 
-4. Open in VS Code and press F5 to run the extension
+## 🎯 Next Steps
 
-## ⚙️ Configuration
+This repository now contains clean documentation of the AI Punk system. The next implementation can use these markdown files as reference for:
 
-Configure AI Punk through VS Code settings:
+1. **System Prompts** - Copy the ReAct prompt with transparency requirements
+2. **Tool Implementation** - Implement all 9 tools as documented
+3. **Architecture** - Follow the Clean Architecture patterns
+4. **Process Visibility** - Ensure full thought process transparency
 
-### Google Gemini (Default)
-```json
-{
-  "aiPunk.provider": "google",
-  "aiPunk.google.apiKey": "your-google-api-key",
-  "aiPunk.google.model": "gemini-1.5-pro"
-}
-```
+## 🔮 Vision
 
-### OpenAI
-```json
-{
-  "aiPunk.provider": "openai",
-  "aiPunk.openAI.apiKey": "your-openai-api-key",
-  "aiPunk.openAI.model": "gpt-4-turbo-preview"
-}
-```
-
-## 🔧 Usage
-
-1. Open AI Punk sidebar panel
-2. Index your workspace: `Ctrl+Shift+P` → "AI Punk: Index Workspace"
-3. Start chatting with the AI agent
-4. The agent will autonomously use tools to complete tasks
-
-## 🚀 Key Features of AI Punk
-
-### Advantages:
-- **Open source** - full transparency and customization
-- **Clean Architecture** - easy to extend and maintain
-- **Multiple AI providers** - not tied to one service
-- **Extensible** - easy to add new tools
-- **Secure** - data and privacy control
-
-### Functionality:
-- ✅ Autonomous complex task solving
-- ✅ Advanced prompts and agent behavior
-- ✅ Complete development tool set
-- ✅ Semantic code search
-- ✅ Multilingual support
-
-## 🤝 Contributing
-
-We welcome contributions to AI Punk!
-
-### Adding a new tool:
-1. Create file in `src/infrastructure/tools/`
-2. Implement `DynamicTool` interface
-3. Add import to `LangChainAdapter.ts`
-4. Update `tools` array
-
-### Improving prompts:
-1. Study prompts in `src/infrastructure/adapters/LangChainAdapter.ts`
-2. Test changes
-3. Create Pull Request with description
-
-## 📝 License
-
-MIT License - see LICENSE file for details.
-
-## 🔗 Links
-
-- [LangChain Documentation](https://js.langchain.com/)
-- [VS Code Extension API](https://code.visualstudio.com/api)
-- [Google Gemini API](https://ai.google.dev/)
-- [OpenAI API](https://platform.openai.com/docs)
+AI Punk will become the most transparent and educational AI coding assistant, where users don't just get solutions - they learn by watching a master craftsman work through problems step by step.
 
 ---
 
-**AI Punk** - Your personal AI assistant for development, built with love for clean code and open technologies! 🎸 
+**AI Punk** - Your transparent AI coding companion! 🤖✨ 
