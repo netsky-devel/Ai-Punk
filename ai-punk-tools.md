@@ -1,5 +1,19 @@
 # AI Punk Tools
 
+## Implementation Context
+
+### Workspace-Aware Operations
+- All tools operate within user-selected workspace directory
+- Paths are resolved through `resolve_workspace_path()` for security
+- No access to files outside workspace boundaries
+- Terminal commands execute in workspace context
+
+### Tool Integration
+- Tools use Rich console for formatted output
+- Error handling with user-friendly messages
+- Progress indicators for long operations
+- Consistent Russian/English language support
+
 ## Core File System Tools
 
 ### 1. list_dir

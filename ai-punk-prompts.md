@@ -1,5 +1,25 @@
 # AI Punk Prompts
 
+## Updated Implementation Notes
+
+### Workspace Context
+- Agent works ONLY in user-selected directory (chosen via UI)
+- All file operations are restricted to workspace boundaries
+- Terminal commands execute in workspace directory
+- Path resolution includes security checks
+
+### Configuration Management
+- AI provider settings stored in ~/.ai-punk/config.json (NOT .env)
+- Users configure providers through app interface
+- Support for Google Gemini, OpenAI, Anthropic
+- Persistent settings across sessions
+
+### Transparency Requirements
+- Show ALL Thought/Action/Observation steps
+- Stream process in real-time with Rich formatting
+- Educational approach - user learns by watching
+- Never hide reasoning or decision-making process
+
 ## Main System Prompt (ReAct Agent)
 
 ```
