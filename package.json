@@ -11,16 +11,68 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:ai-punk.chat"
+    "onView:ai-punk-chat-view"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ai-punk-view-container",
+          "title": "AI Punk",
+          "icon": "$(beaker)"
+        }
+      ]
+    },
+    "views": {
+      "ai-punk-view-container": [
+        {
+          "type": "webview",
+          "id": "ai-punk-chat-view",
+          "name": "Chat"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "ai-punk.chat",
-        "title": "AI Punk: Open Chat"
+        "command": "ai-punk.chat.focus",
+        "title": "Focus AI Punk Chat"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "AI Punk",
+      "properties": {
+        "aiPunk.aiProvider": {
+          "type": "string",
+          "enum": [
+            "Google",
+            "OpenAI"
+          ],
+          "default": "Google",
+          "description": "The AI provider to use."
+        },
+        "aiPunk.google.apiKey": {
+          "type": "string",
+          "description": "API Key for Google AI services.",
+          "secret": true
+        },
+        "aiPunk.google.model": {
+          "type": "string",
+          "default": "gemini-pro",
+          "description": "The Google model to use."
+        },
+        "aiPunk.openAI.apiKey": {
+          "type": "string",
+          "description": "API Key for OpenAI services.",
+          "secret": true
+        },
+        "aiPunk.openAI.model": {
+          "type": "string",
+          "default": "gpt-4-turbo-preview",
+          "description": "The OpenAI model to use."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -29,11 +81,17 @@
     "lint": "eslint src --ext ts"
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
     "@types/node": "18.x",
+    "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "eslint": "^8.56.0",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.62",
+    "@langchain/google-genai": "^0.2.14",
+    "@langchain/openai": "^0.5.18",
+    "langchain": "^0.3.29"
   }
-} 
+}
