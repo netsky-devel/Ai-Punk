@@ -1,14 +1,25 @@
 import * as vscode from 'vscode';
+import { SendMessage } from '../../application/use-cases/SendMessage';
+import { InMemoryConversationRepository } from '../../infrastructure/adapters/InMemoryConversationRepository';
+import { StubAIAdapter } from '../../infrastructure/adapters/StubAIAdapter';
 
 export class ChatWebviewPanel {
     public static currentPanel: ChatWebviewPanel | undefined;
     private readonly _panel: vscode.WebviewPanel;
     private readonly _extensionUri: vscode.Uri;
     private _disposables: vscode.Disposable[] = [];
+    private readonly _sendMessage: SendMessage;
+    private readonly _conversationRepository: InMemoryConversationRepository;
+    private _conversationId: string;
 
     private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
         this._panel = panel;
         this._extensionUri = extensionUri;
+
+        this._conversationRepository = new InMemoryConversationRepository();
+        const aiAdapter = new StubAIAdapter();
+        this._sendMessage = new SendMessage(this._conversationRepository, aiAdapter);
+        this._conversationId = this._conversationRepository.findActiveConversationId()!;
 
         // Set the webview's initial html content
         this._update();
@@ -30,17 +41,22 @@ export class ChatWebviewPanel {
 
         // Handle messages from the webview
         this._panel.webview.onDidReceiveMessage(
-            message => {
+            async message => {
                 switch (message.type) {
                     case 'sendMessage':
-                        // Echo message back to the webview
+                        // Add user message to webview
                         this._panel.webview.postMessage({
                             type: 'addMessage',
                             data: { sender: 'user', text: message.data }
                         });
+
+                        const conversation = await this._sendMessage.execute(this._conversationId, message.data);
+                        const botMessage = conversation.messages[conversation.messages.length - 1];
+
+                        // Add bot message to webview
                         this._panel.webview.postMessage({
                             type: 'addMessage',
-                            data: { sender: 'bot', text: `You said: ${message.data}` }
+                            data: { sender: 'bot', text: botMessage.text }
                         });
                         return;
                 }
