@@ -1,7 +1,7 @@
-import { Conversation } from '../../../domain/entities/Conversation';
-import { Message } from '../../../domain/entities/Message';
-import { IConversationRepository } from '../../ports/IConversationRepository';
-import { IAIAdapter } from '../../ports/IAIAdapter';
+import { Conversation } from '../../domain/entities/Conversation';
+import { Message } from '../../domain/entities/Message';
+import { IConversationRepository } from '../ports/IConversationRepository';
+import { IAIAdapter } from '../ports/IAIAdapter';
 import { randomUUID } from 'crypto';
 
 export class SendMessage {
