@@ -51,7 +51,10 @@ yarn-error.log*
 *.index
 *.faiss
 
+# Development logs and notes
+devlog/
+
 # Temporary files
 *.tmp
 *.temp
-.cache/ 
+.cache/

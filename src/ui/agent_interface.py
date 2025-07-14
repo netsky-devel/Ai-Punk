@@ -21,6 +21,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from ..agent import AIPunkAgent, create_agent
 from ..config import get_config, AIProvider, set_ai_provider
 from ..workspace import get_workspace, select_workspace
+from ..localization import get_localization, t
 
 
 class AgentInterface:
@@ -35,49 +36,49 @@ class AgentInterface:
     def display_banner(self):
         """Display welcome banner"""
         banner_text = Text()
-        banner_text.append("🤖 AI Punk Agent", style="bold bright_blue")
+        banner_text.append(t("welcome_banner"), style="bold bright_blue")
         banner_text.append("\n", style="white")
-        banner_text.append("Автономный помощник для разработки ПО", style="dim")
+        banner_text.append(t("welcome_subtitle"), style="dim")
         
         banner_panel = Panel(
             Align.center(banner_text),
-            title="Добро пожаловать",
+            title=t("welcome_title"),
             border_style="bright_blue",
             padding=(1, 2)
         )
         self.console.print(banner_panel)
         
     def display_status(self):
-        """Display current system status"""
+        """Display current status"""
         status_table = Table(show_header=False, box=None, padding=(0, 1))
-        status_table.add_column("Item", style="bold cyan")
-        status_table.add_column("Value", style="white")
+        status_table.add_column("Setting", style="bold")
+        status_table.add_column("Status", style="white")
         
         # Workspace status
         workspace_path = self.workspace.get_current_workspace()
         if workspace_path:
-            status_table.add_row("📁 Рабочая директория:", str(workspace_path))
+            status_table.add_row("📁 Working Directory:", str(workspace_path))
         else:
-            status_table.add_row("📁 Рабочая директория:", "❌ Не выбрана")
-            
+            status_table.add_row("📁 Working Directory:", "❌ Not selected")
+        
         # AI Provider status
         if self.config.ai_provider:
-            status_table.add_row("🤖 AI Провайдер:", self.config.ai_provider.provider.value)
-            status_table.add_row("🧠 Модель:", self.config.ai_provider.model)
+            provider_name = self.config.ai_provider.provider.value.upper()
+            model_name = self.config.ai_provider.model
+            status_table.add_row("🤖 AI Provider:", f"✅ {provider_name} ({model_name})")
         else:
-            status_table.add_row("🤖 AI Провайдер:", "❌ Не настроен")
+            status_table.add_row("🤖 AI Provider:", "❌ Not configured")
             
         # Agent status
         if self.agent:
-            status_table.add_row("⚡ Агент:", "✅ Готов к работе")
-            status_table.add_row("🔧 Инструменты:", str(len(self.agent.tools)))
+            status_table.add_row("⚡ Agent:", t("agent_ready"))
         else:
-            status_table.add_row("⚡ Агент:", "❌ Не инициализирован")
+            status_table.add_row("⚡ Agent:", t("agent_not_initialized"))
             
         status_panel = Panel(
             status_table,
-            title="📊 Статус системы",
-            border_style="cyan"
+            title="📊 Status",
+            border_style="blue"
         )
         self.console.print(status_panel)
         
@@ -293,23 +294,22 @@ class AgentInterface:
         self.console.print(tools_table)
         
     def show_main_menu(self):
-        """Show main menu"""
-        menu_table = Table(show_header=False, box=None, padding=(0, 1))
+        """Display main menu"""
+        menu_table = Table(show_header=False, box=None, padding=(0, 2))
         menu_table.add_column("Option", style="bold cyan")
         menu_table.add_column("Description", style="white")
         
-        menu_table.add_row("1", "Настроить AI провайдера")
-        menu_table.add_row("2", "Выбрать рабочую директорию")
-        menu_table.add_row("3", "Инициализировать агента")
-        menu_table.add_row("4", "Запустить чат с агентом")
-        menu_table.add_row("5", "Показать доступные инструменты")
-        menu_table.add_row("6", "Показать статус системы")
-        menu_table.add_row("0", "Выход")
+        menu_table.add_row("1", t("setup_ai_provider"))
+        menu_table.add_row("2", t("select_workspace"))
+        menu_table.add_row("3", t("initialize_agent"))
+        menu_table.add_row("4", t("start_chat"))
+        menu_table.add_row("5", t("show_tools"))
+        menu_table.add_row("0", t("exit"))
         
         menu_panel = Panel(
             menu_table,
-            title="📋 Главное меню",
-            border_style="bright_green"
+            title=t("main_menu"),
+            border_style="cyan"
         )
         self.console.print(menu_panel)
         

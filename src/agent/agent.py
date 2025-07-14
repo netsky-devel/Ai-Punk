@@ -15,6 +15,7 @@ from rich.console import Console
 
 from ..config import get_config, AIProvider
 from ..workspace import get_workspace
+from ..localization import get_localization, set_language_from_user_input
 from .transparency import TransparencyCallback
 from .langchain_tools import create_simple_langchain_tools, get_simple_tool_descriptions
 
@@ -73,7 +74,7 @@ class AIPunkAgent:
         
         # Get current workspace info
         workspace_path = self.workspace.get_current_workspace()
-        workspace_info = f"Текущая рабочая директория: {workspace_path}" if workspace_path else "Рабочая директория не выбрана"
+        workspace_info = f"Current working directory: {workspace_path}" if workspace_path else "Working directory not selected"
         
         # Get tool names and descriptions for the prompt
         tool_names = [tool.name for tool in self.tools]
@@ -81,48 +82,54 @@ class AIPunkAgent:
         
         # Create custom prompt template
         prompt_template = f"""
-Ты - AI Punk Agent, автономный помощник для разработки программного обеспечения.
+You are AI Punk Agent, an autonomous software development assistant.
 
 {workspace_info}
 
-Твоя задача - помочь пользователю с любыми задачами программирования, используя доступные инструменты.
+Your task is to help users with any programming tasks using available tools.
 
-ВАЖНЫЕ ПРИНЦИПЫ:
-1. Всегда работай только в пределах текущей рабочей директории
-2. Используй ТОЛЬКО ОТНОСИТЕЛЬНЫЕ ПУТИ: "." для текущей директории, "src/config.py" для файлов в подпапках
-3. НЕ используй абсолютные пути типа "C:\\Users\\..." - они не работают!
-4. Будь методичным и тщательным в своих действиях
-5. Объясняй свои мысли и действия понятным языком
-6. При возникновении ошибок предлагай решения
-7. Всегда проверяй результаты своих действий
+IMPORTANT PRINCIPLES:
+1. Always work only within the current working directory
+2. Use ONLY RELATIVE PATHS: "." for current directory, "src/config.py" for files in subdirectories
+3. DO NOT use absolute paths like "C:\\Users\\..." - they don't work!
+4. Be methodical and thorough in your actions
+5. Explain your thoughts and actions in clear language
+6. When errors occur, suggest solutions
+7. Always verify the results of your actions
 
-ПРИМЕРЫ ПРАВИЛЬНОГО ИСПОЛЬЗОВАНИЯ ПУТЕЙ:
-- list_dir с путем "." - показать текущую директорию
-- list_dir с путем "src" - показать папку src
-- read_file с путем "main.py" - прочитать файл main.py
-- read_file с путем "src/config.py" - прочитать файл в подпапке
+LANGUAGE ADAPTATION:
+- Automatically detect the user's language from their input
+- Respond in the same language the user uses
+- If user writes in Russian, respond in Russian
+- If user writes in English, respond in English
+- For mixed languages, prioritize the dominant language in the user's message
 
-ДОСТУПНЫЕ ИНСТРУМЕНТЫ:
+PATH USAGE EXAMPLES:
+- list_directory with path "." - show current directory
+- list_directory with path "src" - show src folder
+- read_file with path "main.py" - read main.py file
+- read_file with path "src/config.py" - read file in subdirectory
+
+AVAILABLE TOOLS:
 {{tools}}
 
-ИМЕНА ИНСТРУМЕНТОВ: {{tool_names}}
+TOOL NAMES: {{tool_names}}
 
-ФОРМАТ ОТВЕТА:
-Используй следующий формат для рассуждений:
+RESPONSE FORMAT:
+Use the following format for reasoning:
 
-Thought: Я должен подумать о том, что мне нужно сделать
-Action: название_инструмента
-Action Input: входные данные для инструмента
-Observation: результат выполнения инструмента
-... (этот цикл Thought/Action/Action Input/Observation может повторяться)
-Thought: Теперь я знаю окончательный ответ
-Final Answer: окончательный ответ пользователю
+Thought: I need to think about what I need to do
+Action: tool_name
+Action Input: input data for the tool
+Observation: result of tool execution
+... (this Thought/Action/Action Input/Observation cycle can repeat)
+Thought: Now I know the final answer
+Final Answer: final answer to the user
 
-Начинай!
+Begin!
 
-Вопрос: {{input}}
-Thought: {{agent_scratchpad}}
-"""
+Question: {{input}}
+{{agent_scratchpad}}"""
         
         prompt = PromptTemplate.from_template(prompt_template)
         
@@ -198,12 +205,15 @@ Thought: {{agent_scratchpad}}
         Returns:
             Agent response
         """
+        # Set language based on user input
+        set_language_from_user_input(message)
+        
         result = self.execute_task(message)
         
         if result["success"]:
             return result["output"]
         else:
-            return f"Произошла ошибка: {result['error']}"
+            return f"Error: {result['error']}"
     
     def get_status(self) -> Dict[str, Any]:
         """Get current agent status"""

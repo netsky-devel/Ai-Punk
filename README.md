@@ -1,172 +1,146 @@
-# AI Punk - Autonomous AI Coding Agent
+# 🤖 AI Punk - Autonomous Software Development Assistant
 
-🤖 **AI Punk** - это полнофункциональный автономный помощник для разработки программного обеспечения с **полной прозрачностью процесса мышления**. Агент использует LangChain ReAct паттерн и современные AI модели для самостоятельного выполнения задач программирования.
+🤖 **AI Punk** is a full-featured autonomous software development assistant with **complete transparency of the thinking process**. The agent uses LangChain ReAct pattern and modern AI models to independently perform programming tasks.
 
-## ✨ Ключевые особенности
+## ✨ Key Features
 
-- **🧠 Полная прозрачность мышления**: Видите каждый шаг рассуждений агента в реальном времени
-- **🤖 Автономное выполнение**: Агент самостоятельно планирует и выполняет сложные задачи
-- **🛠️ 9 мощных инструментов**: Полный набор для работы с файлами, поиска и выполнения команд
-- **🎨 Красивый интерфейс**: Rich-терминал с цветами, иконками и прогресс-барами
-- **🔒 Безопасность**: Работа только в выбранной пользователем директории
-- **🌍 Мультиязычность**: Интерфейс на русском языке с поддержкой английского
+- **🧠 Complete thinking transparency**: See every step of the agent's reasoning in real-time
+- **🤖 Autonomous execution**: Agent independently plans and executes complex tasks
+- **🔒 Secure workspace**: Agent works only within the selected directory for security
+- **🛠️ Rich tool set**: File operations, terminal commands, code search, and editing
+- **🎨 Beautiful interface**: Rich terminal UI with full process visualization
+- **🌐 Multi-language support**: Automatically detects user language (English/Russian)
+- **⚡ High performance**: Fast LangChain integration with optimized tools
 
-## 🚀 Быстрый старт
+## 🚀 Quick Start
 
-### 1. Установка
-```bash
-git clone <repository>
-cd ai-punk
-python -m venv venv
+1. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-# Windows
-venv\Scripts\activate
-# Linux/Mac  
-source venv/bin/activate
+2. **Configure AI provider**:
+   ```bash
+   python main.py
+   # Select option 1 - Setup AI Provider
+   ```
 
-pip install -r requirements.txt
-```
+3. **Select working directory**:
+   ```bash
+   # Select option 2 - Select Working Directory
+   ```
 
-### 2. Запуск
-```bash
-python main.py
-```
+4. **Initialize agent**:
+   ```bash
+   # Select option 3 - Initialize Agent
+   ```
 
-### 3. Настройка
-1. **Настроить AI провайдера** - выберите Google Gemini, OpenAI или Anthropic
-2. **Выбрать рабочую директорию** - укажите папку проекта
-3. **Инициализировать агента** - запустите AI агента
-4. **Начать работу** - введите задачу в чате
+5. **Start working**:
+   ```bash
+   # Select option 4 - Start Chat with Agent
+   ```
 
-## 🛠️ Доступные инструменты
+## 🧠 Process Transparency
 
-### 📁 Файловые операции
-- `list_dir` - Просмотр содержимого директории с подробной информацией
-- `read_file` - Чтение файлов с поддержкой диапазонов строк и подсветкой синтаксиса
-- `edit_file` - Создание и редактирование файлов с автобэкапом
-- `delete_file` - Безопасное удаление с подтверждением
-
-### 🔍 Поиск и анализ
-- `grep_search` - Поиск по содержимому файлов с regex поддержкой
-- `file_search` - Fuzzy поиск файлов по имени с ранжированием
-- `codebase_search` - Поиск по всей кодовой базе с фильтрацией
-- `search_replace` - Поиск и замена текста с предварительным просмотром
-
-### ⚡ Системные операции
-- `run_terminal_cmd` - Выполнение команд терминала в рабочей директории
-
-## 💭 Прозрачность процесса
-
-AI Punk показывает **полный процесс мышления агента**:
+AI Punk shows the **complete agent thinking process**:
 
 ```
-🧠 Мышление агента (Шаг 1)
-┌─ Я должен проанализировать структуру проекта, начну с просмотра корневой директории
+╭─ 🧠 Agent Thinking (Step 1) ─────────────────────────────────────────────────────╮
+│ I need to analyze the project structure first to understand what we're working   │
+│ with. Let me start by listing the current directory contents.                    │
+╰──────────────────────────────────────────────────────────────────────────────────╯
 
-⚡ Действие агента  
-┌─ 🔧 Инструмент: list_dir
-└─ 📝 Ввод: .
+╭─ ⚡ Agent Action ─────────────────────────────────────────────────────────────────╮
+│  🔧 Tool:  list_directory                                                        │
+│  📝 Input: "."                                                                   │
+╰──────────────────────────────────────────────────────────────────────────────────╯
 
-📤 Результат инструмента
-┌─ [Результаты выполнения list_dir]
-
-✅ Результат выполнения (за 2.34с)
-┌─ [Финальный ответ агента]
+╭─ ✅ Execution Result (in 0.15s) ────────────────────────────────────────────────╮
+│ [Agent's final answer]                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-## 🏗️ Архитектура
-
-Проект построен на **Clean Architecture** принципах:
+## 📁 Project Structure
 
 ```
-src/
-├── agent/           # LangChain ReAct агент с прозрачностью
-├── tools/           # 9 инструментов для работы с кодом  
-├── ui/              # Rich интерфейс для терминала
-├── config.py        # Система конфигурации
-└── workspace.py     # Менеджер рабочих директорий
+ai-punk/
+├── main.py             # Application entry point
+├── src/
+│   ├── agent/          # LangChain ReAct agent with transparency
+│   ├── tools/          # File operations and system tools
+│   ├── ui/             # Rich terminal interface
+│   ├── config.py       # Configuration management
+│   ├── workspace.py    # Secure workspace management
+│   └── localization.py # Multi-language support
+├── requirements.txt    # Python dependencies
+└── README.md          # This file
 ```
 
-### Технический стек
-- **LangChain** - ReAct агент и интеграция с AI моделями
-- **Rich** - Красивый терминальный интерфейс
-- **Pydantic** - Валидация данных и настроек
-- **Python 3.9+** - Современный Python с type hints
+## 🛠️ Available Tools
 
-## 🎯 Примеры использования
+- **📁 File Operations**: list_directory, read_file, edit_file
+- **🔍 Search**: grep_search for finding code patterns
+- **💻 Terminal**: run_terminal for executing commands
+- **🔒 Security**: All operations limited to selected workspace
 
-### Анализ проекта
-```
-Проанализируй архитектуру этого проекта и предложи улучшения
-```
+## 🔧 Dependencies
 
-### Создание кода
-```
-Создай REST API на FastAPI для управления задачами с базой данных
-```
+- **Python 3.8+** - Core runtime
+- **LangChain** - ReAct agent and AI model integration
+- **Rich** - Beautiful terminal interface
+- **OpenAI/Google/Anthropic** - AI model providers
 
-### Отладка и рефакторинг
-```
-Найди и исправь все ошибки в коде, улучши производительность
-```
+## 🌐 Language Support
 
-### Автоматизация
+The agent automatically detects the user's language and responds accordingly:
+- **English**: Default language for documentation and system messages
+- **Russian**: Full support with automatic detection
+- **Mixed languages**: Prioritizes the dominant language in user input
+
+## 🔒 Security Features
+
+- **Workspace isolation**: Agent cannot access files outside the selected directory
+- **Path validation**: All file operations use relative paths only
+- **Safe execution**: Terminal commands run in controlled environment
+
+## 📝 Usage Examples
+
+### Basic file analysis:
 ```
-Настрой CI/CD пайплайн для автоматического тестирования и деплоя
-```
-
-## ⚙️ Конфигурация
-
-Настройки автоматически сохраняются в `~/.ai-punk/config.json`:
-
-```json
-{
-  "workspace_path": "/path/to/your/project",
-  "ai_provider": {
-    "provider": "google",
-    "api_key": "your_api_key",
-    "model": "gemini-pro",
-    "max_tokens": 4000,
-    "temperature": 0.1
-  },
-  "agent": {
-    "max_iterations": 10,
-    "verbose": true,
-    "show_full_process": true
-  }
-}
+User: "Analyze the project structure and tell me what this codebase does"
+Agent: [Analyzes files, provides detailed explanation]
 ```
 
-## 📚 Документация
+### Code modification:
+```
+User: "Add error handling to the main.py file"
+Agent: [Reads file, adds proper error handling, explains changes]
+```
 
-- 📖 [Руководство пользователя](AGENT_USAGE.md) - Подробное руководство по использованию
-- 🏗️ [Архитектура проекта](ai-punk-architecture.md) - Техническая документация
-- 🛠️ [Описание инструментов](ai-punk-tools.md) - Подробности о каждом инструменте
-- 📝 [Журнал разработки](DEVELOPMENT_LOG.md) - История развития проекта
+### Multi-language interaction:
+```
+User: "создай новый файл config.json с базовыми настройками"
+Agent: [Responds in Russian, creates the file as requested]
+```
 
-## 🔒 Безопасность
+## 🤝 Contributing
 
-- ✅ Работа только в выбранной пользователем директории
-- ✅ Автоматическое создание резервных копий файлов
-- ✅ Подтверждение опасных операций (удаление файлов)
-- ✅ Валидация и санитизация всех путей
-- ✅ Изоляция выполнения команд в рабочей директории
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## 🤝 Участие в разработке
+## 📄 License
 
-1. Fork репозитория
-2. Создайте feature branch (`git checkout -b feature/amazing-feature`)
-3. Внесите изменения и добавьте тесты
-4. Commit изменения (`git commit -m 'Add amazing feature'`)
-5. Push в branch (`git push origin feature/amazing-feature`)
-6. Создайте Pull Request
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 📄 Лицензия
+## 🆘 Support
 
-Проект распространяется под лицензией MIT. См. файл [LICENSE](LICENSE) для подробностей.
+If you encounter any issues:
+1. Check that your AI provider is properly configured
+2. Ensure the working directory is selected
+3. Verify all dependencies are installed
+4. Check the console output for detailed error messages
 
----
-
-**🎉 AI Punk готов изменить ваш подход к разработке ПО!** 
-
-Попробуйте прямо сейчас и убедитесь в мощи автономного AI-помощника с полной прозрачностью процесса мышления. 
+For additional help, please open an issue on GitHub. 
