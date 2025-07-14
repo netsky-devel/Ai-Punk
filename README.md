@@ -1,96 +1,172 @@
-# AI Punk
+# AI Punk - Autonomous AI Coding Agent
 
-**Autonomous AI Coding Assistant with Full Process Transparency**
+🤖 **AI Punk** - это полнофункциональный автономный помощник для разработки программного обеспечения с **полной прозрачностью процесса мышления**. Агент использует LangChain ReAct паттерн и современные AI модели для самостоятельного выполнения задач программирования.
 
-## 🎯 Philosophy
+## ✨ Ключевые особенности
 
-AI Punk is not just another AI assistant - it's an **autonomous agent** that shows you its complete thought process as it works. You'll see every decision, every tool usage, and every step of reasoning in real-time.
+- **🧠 Полная прозрачность мышления**: Видите каждый шаг рассуждений агента в реальном времени
+- **🤖 Автономное выполнение**: Агент самостоятельно планирует и выполняет сложные задачи
+- **🛠️ 9 мощных инструментов**: Полный набор для работы с файлами, поиска и выполнения команд
+- **🎨 Красивый интерфейс**: Rich-терминал с цветами, иконками и прогресс-барами
+- **🔒 Безопасность**: Работа только в выбранной пользователем директории
+- **🌍 Мультиязычность**: Интерфейс на русском языке с поддержкой английского
 
-### Key Principles
+## 🚀 Быстрый старт
 
-1. **🔍 Full Transparency** - See every thought, action, and observation
-2. **🤖 Autonomous Operation** - No permission asking, full automation  
-3. **🧠 Educational Experience** - Learn by watching the AI work
-4. **🌍 Multilingual Support** - Responds in your language
-5. **🏗️ Clean Architecture** - Domain-driven design principles
+### 1. Установка
+```bash
+git clone <repository>
+cd ai-punk
+python -m venv venv
 
-## 🚀 Features
+# Windows
+venv\Scripts\activate
+# Linux/Mac  
+source venv/bin/activate
 
-- **Real-time Process Visibility** - Watch the AI think and act
-- **Multi-step Task Execution** - Complex problem decomposition
-- **Tool Chaining** - Combines multiple tools for solutions
-- **Codebase Understanding** - Semantic search and analysis
-- **File System Operations** - Read, write, search, and manage files
-- **Terminal Integration** - Execute commands and see results
-- **Vector Search** - Semantic code search with embeddings
-- **Multiple AI Providers** - OpenAI, Google, Anthropic support
-
-## 📁 Project Structure
-
-```
-ai-punk/
-├── ai-punk-prompts.md       # System prompts and ReAct patterns
-├── ai-punk-tools.md         # Tool descriptions and usage
-├── ai-punk-architecture.md  # Clean architecture documentation
-└── README.md               # This file
+pip install -r requirements.txt
 ```
 
-## 🔧 Saved Components
-
-All key components from the previous implementation are preserved in markdown files:
-
-- **Prompts** (`ai-punk-prompts.md`) - Complete system prompts with transparency requirements
-- **Tools** (`ai-punk-tools.md`) - All 9 tools with descriptions and usage patterns  
-- **Architecture** (`ai-punk-architecture.md`) - Clean architecture layers and design patterns
-
-## 🎸 What Makes AI Punk Different
-
-### Traditional AI Assistants:
-```
-User: "Fix this bug"
-AI: "I fixed the bug. Here's the solution."
+### 2. Запуск
+```bash
+python main.py
 ```
 
-### AI Punk:
+### 3. Настройка
+1. **Настроить AI провайдера** - выберите Google Gemini, OpenAI или Anthropic
+2. **Выбрать рабочую директорию** - укажите папку проекта
+3. **Инициализировать агента** - запустите AI агента
+4. **Начать работу** - введите задачу в чате
+
+## 🛠️ Доступные инструменты
+
+### 📁 Файловые операции
+- `list_dir` - Просмотр содержимого директории с подробной информацией
+- `read_file` - Чтение файлов с поддержкой диапазонов строк и подсветкой синтаксиса
+- `edit_file` - Создание и редактирование файлов с автобэкапом
+- `delete_file` - Безопасное удаление с подтверждением
+
+### 🔍 Поиск и анализ
+- `grep_search` - Поиск по содержимому файлов с regex поддержкой
+- `file_search` - Fuzzy поиск файлов по имени с ранжированием
+- `codebase_search` - Поиск по всей кодовой базе с фильтрацией
+- `search_replace` - Поиск и замена текста с предварительным просмотром
+
+### ⚡ Системные операции
+- `run_terminal_cmd` - Выполнение команд терминала в рабочей директории
+
+## 💭 Прозрачность процесса
+
+AI Punk показывает **полный процесс мышления агента**:
+
 ```
-User: "Fix this bug"
-AI: 
-Thought: I need to understand the codebase structure first
-Action: list_dir
-Action Input: "."
-Observation: Found these files: src/, tests/, package.json...
+🧠 Мышление агента (Шаг 1)
+┌─ Я должен проанализировать структуру проекта, начну с просмотра корневой директории
 
-Thought: Now I should look at the main source files
-Action: read_file  
-Action Input: "src/main.js"
-Observation: The file contains...
+⚡ Действие агента  
+┌─ 🔧 Инструмент: list_dir
+└─ 📝 Ввод: .
 
-Thought: I can see the bug is in line 45, let me fix it
-Action: edit_file
-Action Input: {"path": "src/main.js", "content": "..."}
-Observation: Successfully wrote to src/main.js
+📤 Результат инструмента
+┌─ [Результаты выполнения list_dir]
 
-Thought: Let me verify the fix works
-Action: run_terminal_cmd
-Action Input: "npm test"
-Observation: All tests passed!
-
-Final Answer: Bug fixed! The issue was...
+✅ Результат выполнения (за 2.34с)
+┌─ [Финальный ответ агента]
 ```
 
-## 🎯 Next Steps
+## 🏗️ Архитектура
 
-This repository now contains clean documentation of the AI Punk system. The next implementation can use these markdown files as reference for:
+Проект построен на **Clean Architecture** принципах:
 
-1. **System Prompts** - Copy the ReAct prompt with transparency requirements
-2. **Tool Implementation** - Implement all 9 tools as documented
-3. **Architecture** - Follow the Clean Architecture patterns
-4. **Process Visibility** - Ensure full thought process transparency
+```
+src/
+├── agent/           # LangChain ReAct агент с прозрачностью
+├── tools/           # 9 инструментов для работы с кодом  
+├── ui/              # Rich интерфейс для терминала
+├── config.py        # Система конфигурации
+└── workspace.py     # Менеджер рабочих директорий
+```
 
-## 🔮 Vision
+### Технический стек
+- **LangChain** - ReAct агент и интеграция с AI моделями
+- **Rich** - Красивый терминальный интерфейс
+- **Pydantic** - Валидация данных и настроек
+- **Python 3.9+** - Современный Python с type hints
 
-AI Punk will become the most transparent and educational AI coding assistant, where users don't just get solutions - they learn by watching a master craftsman work through problems step by step.
+## 🎯 Примеры использования
+
+### Анализ проекта
+```
+Проанализируй архитектуру этого проекта и предложи улучшения
+```
+
+### Создание кода
+```
+Создай REST API на FastAPI для управления задачами с базой данных
+```
+
+### Отладка и рефакторинг
+```
+Найди и исправь все ошибки в коде, улучши производительность
+```
+
+### Автоматизация
+```
+Настрой CI/CD пайплайн для автоматического тестирования и деплоя
+```
+
+## ⚙️ Конфигурация
+
+Настройки автоматически сохраняются в `~/.ai-punk/config.json`:
+
+```json
+{
+  "workspace_path": "/path/to/your/project",
+  "ai_provider": {
+    "provider": "google",
+    "api_key": "your_api_key",
+    "model": "gemini-pro",
+    "max_tokens": 4000,
+    "temperature": 0.1
+  },
+  "agent": {
+    "max_iterations": 10,
+    "verbose": true,
+    "show_full_process": true
+  }
+}
+```
+
+## 📚 Документация
+
+- 📖 [Руководство пользователя](AGENT_USAGE.md) - Подробное руководство по использованию
+- 🏗️ [Архитектура проекта](ai-punk-architecture.md) - Техническая документация
+- 🛠️ [Описание инструментов](ai-punk-tools.md) - Подробности о каждом инструменте
+- 📝 [Журнал разработки](DEVELOPMENT_LOG.md) - История развития проекта
+
+## 🔒 Безопасность
+
+- ✅ Работа только в выбранной пользователем директории
+- ✅ Автоматическое создание резервных копий файлов
+- ✅ Подтверждение опасных операций (удаление файлов)
+- ✅ Валидация и санитизация всех путей
+- ✅ Изоляция выполнения команд в рабочей директории
+
+## 🤝 Участие в разработке
+
+1. Fork репозитория
+2. Создайте feature branch (`git checkout -b feature/amazing-feature`)
+3. Внесите изменения и добавьте тесты
+4. Commit изменения (`git commit -m 'Add amazing feature'`)
+5. Push в branch (`git push origin feature/amazing-feature`)
+6. Создайте Pull Request
+
+## 📄 Лицензия
+
+Проект распространяется под лицензией MIT. См. файл [LICENSE](LICENSE) для подробностей.
 
 ---
 
-**AI Punk** - Your transparent AI coding companion! 🤖✨ 
+**🎉 AI Punk готов изменить ваш подход к разработке ПО!** 
+
+Попробуйте прямо сейчас и убедитесь в мощи автономного AI-помощника с полной прозрачностью процесса мышления. 
