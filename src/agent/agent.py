@@ -24,6 +24,8 @@ from .transparency import TransparencyCallback
 from .wrappers.factory import create_simple_langchain_tools, get_simple_tool_descriptions
 from ..tools.project_analyzer import ProjectAnalyzer
 from ..context.manager import SmartContextManager
+from .prompts.core import PromptManager
+from .session import SessionManager
 
 
 class AIPunkAgent:
@@ -43,6 +45,12 @@ class AIPunkAgent:
         # Smart Context Manager for intelligent assistance
         self.context_manager = None
         self._context_initialized = False
+        
+        # Advanced Prompt Management System
+        self.prompt_manager = None
+        
+        # Session Management for continuity
+        self.session_manager = None
         
         # Initialize LLM and agent
         self.llm = self._create_llm()
@@ -88,80 +96,30 @@ class AIPunkAgent:
             raise ValueError(f"Unsupported AI provider: {provider_config.provider}")
     
     def _create_agent(self):
-        """Create ReAct agent with custom prompt"""
+        """Create ReAct agent with advanced prompt system"""
         
-        # Get current workspace info
-        workspace_path = self.workspace.get_current_workspace()
-        workspace_info = f"Current working directory: {workspace_path}" if workspace_path else "Working directory not selected"
+        # Use advanced prompt system for dynamic prompt generation
+        # The actual prompt will be generated dynamically for each task
         
-        # Get tool names and descriptions for the prompt
-        tool_names = [tool.name for tool in self.tools]
-        tool_descriptions = get_simple_tool_descriptions()
-        
-        # Create custom prompt template
-        prompt_template = f"""
-You are AI Punk Agent, an autonomous software development assistant with SEMANTIC UNDERSTANDING of codebases.
+        # Create a basic template for now - will be enhanced dynamically
+        basic_template = """You are AI Punk Agent, an autonomous software development assistant.
 
-{workspace_info}
+Available tools: {tools}
+Tool names: {tool_names}
 
-Your task is to help users with any programming tasks using available tools. You have INTELLIGENT UNDERSTANDING of the project structure and can find code by meaning, not just text search.
-
-IMPORTANT PRINCIPLES:
-1. Always work only within the current working directory
-2. Use ONLY RELATIVE PATHS: "." for current directory, "src/config.py" for files in subdirectories
-3. DO NOT use absolute paths like "C:\\Users\\..." - they don't work!
-4. Be methodical and thorough in your actions
-5. Explain your thoughts and actions in clear language
-6. When errors occur, suggest solutions
-7. Always verify the results of your actions
-
-INTELLIGENT SEARCH CAPABILITIES:
-- Use 'semantic_search' for finding code by MEANING and FUNCTIONALITY
-- Use 'grep_search' only for exact text matches
-- semantic_search understands concepts like "authentication", "error handling", "database operations"
-- Always prefer semantic_search when user asks "where", "how", "find code that does X"
-
-LANGUAGE ADAPTATION:
-- Automatically detect the user's language from their input
-- Respond in the same language the user uses
-- If user writes in Russian, respond in Russian
-- If user writes in English, respond in English
-- For mixed languages, prioritize the dominant language in the user's message
-
-PATH USAGE EXAMPLES:
-- list_directory with path "." - show current directory
-- list_directory with path "src" - show src folder
-- read_file with path "main.py" - read main.py file
-- read_file with path "src/config.py" - read file in subdirectory
-
-SEARCH STRATEGY:
-- For conceptual questions: Use semantic_search first (e.g., "where is user authentication?")
-- For exact text: Use grep_search (e.g., find "import pandas")
-- Read files that semantic_search identifies as relevant
-- Understand the project context before making changes
-
-AVAILABLE TOOLS:
-{{tools}}
-
-TOOL NAMES: {{tool_names}}
-
-RESPONSE FORMAT:
-Use the following format for reasoning:
-
+Use this format:
 Thought: I need to think about what I need to do
 Action: tool_name
 Action Input: input data for the tool
 Observation: result of tool execution
-... (this Thought/Action/Action Input/Observation cycle can repeat)
+... (repeat as needed)
 Thought: Now I know the final answer
 Final Answer: final answer to the user
 
-Begin!
-
-Question: {{input}}
-{{agent_scratchpad}}"""
+Question: {input}
+{agent_scratchpad}"""
         
-        prompt = PromptTemplate.from_template(prompt_template)
+        prompt = PromptTemplate.from_template(basic_template)
         
         return create_react_agent(
             llm=self.llm,
@@ -311,16 +269,31 @@ Question: {{input}}
         return None
     
     def _initialize_context_manager(self):
-        """Initialize Smart Context Manager asynchronously"""
+        """Initialize Smart Context Manager, Advanced Prompt System and Session Management"""
         try:
             workspace_path = self.workspace.get_current_workspace()
+            workspace_path_str = str(workspace_path) if workspace_path else None
+            
+            # Initialize session manager first
+            self.session_manager = SessionManager(workspace_path_str)
+            
             if workspace_path:
                 self.context_manager = SmartContextManager(self.workspace)
+                self.prompt_manager = PromptManager(self.context_manager)
                 self.console.print("🧠 [blue]Smart Context Manager готов к инициализации[/blue]")
+                self.console.print("🎯 [blue]Advanced Prompt System активирован[/blue]")
+                self.console.print("💾 [blue]Session Management готов к работе[/blue]")
             else:
+                # Initialize prompt manager without context manager
+                self.prompt_manager = PromptManager(None)
                 self.console.print("⚠️ [yellow]Workspace не выбран - Smart Context Manager недоступен[/yellow]")
+                self.console.print("🎯 [blue]Advanced Prompt System работает в базовом режиме[/blue]")
+                self.console.print("💾 [blue]Session Management работает глобально[/blue]")
         except Exception as e:
-            self.console.print(f"⚠️ [yellow]Ошибка инициализации Smart Context Manager: {e}[/yellow]")
+            self.console.print(f"⚠️ [yellow]Ошибка инициализации систем: {e}[/yellow]")
+            # Fallback to basic systems
+            self.prompt_manager = PromptManager(None)
+            self.session_manager = SessionManager(None)
     
     async def _ensure_context_initialized(self) -> bool:
         """Ensure context manager is initialized"""
@@ -342,36 +315,57 @@ Question: {{input}}
         return True
     
     async def execute_task_with_context(self, task: str) -> Dict[str, Any]:
-        """Execute task with Smart Context Manager enhancement"""
+        """Execute task with Smart Context Manager and Advanced Prompt System"""
         start_time = time.time()
         
         # Initialize context if available
         context_available = await self._ensure_context_initialized()
         
-        # Get context suggestions if available
-        context_suggestions = {}
-        if context_available:
-            try:
-                context_suggestions = await self.context_manager.suggest_next_actions(task)
-                
-                # Display context insights
+        # Initialize systems if not already done
+        if not self.prompt_manager or not self.session_manager:
+            self._initialize_context_manager()
+        
+        # Add conversation context from session
+        conversation_context = ""
+        if self.session_manager:
+            conversation_context = self.session_manager.get_conversation_context()
+        
+        # Generate enhanced prompt using advanced prompt system
+        try:
+            workspace_path = self.workspace.get_current_workspace()
+            tool_names = [tool.name for tool in self.tools]
+            
+            # Enhanced task with conversation context
+            enhanced_task_with_context = f"{task}\n\n{conversation_context}" if conversation_context != "No previous conversation history." else task
+            
+            enhanced_prompt = await self.prompt_manager.create_enhanced_prompt(
+                base_task=enhanced_task_with_context,
+                tools=tool_names,
+                workspace_path=str(workspace_path) if workspace_path else None
+            )
+            
+            # Display context insights if available
+            if self.prompt_manager.context_manager:
+                context_suggestions = await self.prompt_manager.context_manager.suggest_next_actions(task)
                 if context_suggestions.get("suggested_next_steps"):
                     self.console.print("\n💡 [blue]Smart Context Suggestions:[/blue]")
                     for suggestion in context_suggestions["suggested_next_steps"]:
                         self.console.print(f"   • {suggestion}")
                     self.console.print()
-                
-            except Exception as e:
-                self.console.print(f"⚠️ [yellow]Context analysis error: {e}[/yellow]")
+            
+        except Exception as e:
+            self.console.print(f"⚠️ [yellow]Prompt enhancement error: {e}[/yellow]")
+            enhanced_prompt = task
         
-        # Enhanced prompt with context
-        enhanced_task = task
-        if context_suggestions.get("semantic_matches"):
-            relevant_files = [match["file_path"] for match in context_suggestions["semantic_matches"][:2]]
-            enhanced_task += f"\n\nContext: Consider these relevant files: {', '.join(relevant_files)}"
+        # Execute task with enhanced prompt
+        result = self._execute_task_with_enhanced_prompt(enhanced_prompt, task)
         
-        # Execute original task using basic method to avoid recursion
-        result = self._execute_task_basic(enhanced_task)
+        # Update session memory and save conversation turn
+        if self.prompt_manager:
+            self.prompt_manager.update_session_memory(task, result)
+        
+        if self.session_manager:
+            self.session_manager.add_conversation_turn(task, result)
         
         # Track execution with context manager
         if context_available:
@@ -379,7 +373,7 @@ Question: {{input}}
                 execution_time = time.time() - start_time
                 await self.context_manager.track_action(
                     tool_name="agent_execution",
-                    input_data={"task": task, "enhanced": bool(context_suggestions)},
+                    input_data={"task": task, "enhanced": True},
                     result={"success": result["success"]},
                     execution_time=execution_time
                 )
@@ -387,6 +381,42 @@ Question: {{input}}
                 self.console.print(f"⚠️ [yellow]Context tracking error: {e}[/yellow]")
         
         return result
+    
+    def _execute_task_with_enhanced_prompt(self, enhanced_prompt: str, original_task: str) -> Dict[str, Any]:
+        """Execute task with enhanced prompt"""
+        # Display welcome message and task header
+        self.transparency_callback.display_welcome()
+        self.transparency_callback.display_task_header(original_task)
+        
+        try:
+            # Get current workspace for context
+            workspace_path = self.workspace.get_current_workspace()
+            
+            # Use enhanced prompt as input
+            agent_input = {
+                "input": enhanced_prompt,
+                "workspace": str(workspace_path) if workspace_path else "Не выбрана"
+            }
+            
+            # Execute the agent
+            result = self.agent_executor.invoke(agent_input)
+            
+            return {
+                "success": True,
+                "output": result.get("output", ""),
+                "intermediate_steps": result.get("intermediate_steps", []),
+                "workspace": str(workspace_path) if workspace_path else None
+            }
+            
+        except Exception as e:
+            error_msg = f"Ошибка выполнения задачи: {str(e)}"
+            self.console.print(f"❌ {error_msg}", style="red")
+            
+            return {
+                "success": False,
+                "error": error_msg,
+                "workspace": str(workspace_path) if workspace_path else None
+            }
     
     async def add_file_to_context(self, file_path: str, content: str = None):
         """Add file content to context for semantic search"""
@@ -425,6 +455,28 @@ Question: {{input}}
             return await self.context_manager.get_status()
         except Exception as e:
             return {"available": False, "error": str(e)}
+    
+    def get_session_stats(self) -> Dict[str, Any]:
+        """Get session statistics and status"""
+        if not self.session_manager:
+            return {"available": False, "reason": "Session manager not initialized"}
+        
+        try:
+            stats = self.session_manager.get_session_stats()
+            stats["available"] = True
+            return stats
+        except Exception as e:
+            return {"available": False, "error": str(e)}
+    
+    def clear_session_memory(self):
+        """Clear session memory and start fresh"""
+        if self.session_manager:
+            self.session_manager.clear_session()
+            self.console.print("🔄 [green]Session memory cleared - starting fresh![/green]")
+        
+        if self.prompt_manager:
+            self.prompt_manager.clear_session()
+            self.console.print("🔄 [green]Prompt memory cleared![/green]")
 
 
 def create_agent(console: Optional[Console] = None) -> AIPunkAgent:

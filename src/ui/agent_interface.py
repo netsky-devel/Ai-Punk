@@ -76,6 +76,18 @@ class AgentInterface:
         # Agent status
         if self.agent:
             status_table.add_row("⚡ Agent:", self.localization.get("agent_ready"))
+            
+            # Session status
+            try:
+                session_stats = self.agent.get_session_stats()
+                if session_stats.get("available"):
+                    turns_count = session_stats.get("total_turns", 0)
+                    success_rate = session_stats.get("success_rate", 0) * 100
+                    status_table.add_row("💾 Session:", f"✅ {turns_count} взаимодействий ({success_rate:.1f}% успех)")
+                else:
+                    status_table.add_row("💾 Session:", "❌ Недоступна")
+            except Exception:
+                status_table.add_row("💾 Session:", "❓ Неизвестно")
         else:
             status_table.add_row("⚡ Agent:", self.localization.get("agent_not_initialized"))
             
@@ -306,6 +318,21 @@ class AgentInterface:
             tools_table.add_row(tool.name, tool.description)
             
         self.console.print(tools_table)
+    
+    def clear_session_memory(self):
+        """Clear session memory and start fresh"""
+        if not self.agent:
+            self.console.print("❌ Сначала инициализируйте агента", style="red")
+            return
+        
+        if Confirm.ask("🔄 Очистить память сессии? Вся история взаимодействий будет удалена."):
+            try:
+                self.agent.clear_session_memory()
+                self.console.print("✅ Память сессии успешно очищена!", style="green")
+            except Exception as e:
+                self.console.print(f"❌ Ошибка при очистке памяти: {e}", style="red")
+        else:
+            self.console.print("Операция отменена", style="yellow")
         
     def show_main_menu(self):
         """Display main menu"""
@@ -318,6 +345,7 @@ class AgentInterface:
         menu_table.add_row("3", self.localization.get("initialize_agent"))
         menu_table.add_row("4", self.localization.get("start_chat"))
         menu_table.add_row("5", self.localization.get("show_tools"))
+        menu_table.add_row("6", "Clear Session Memory")
         menu_table.add_row("0", self.localization.get("exit"))
         
         menu_panel = Panel(
@@ -335,7 +363,7 @@ class AgentInterface:
             self.console.print()
             self.show_main_menu()
             
-            choice = Prompt.ask("Выберите действие", choices=["0", "1", "2", "3", "4", "5", "6"])
+            choice = Prompt.ask("Выберите действие", choices=["0", "1", "2", "3", "4", "5", "6", "7"])
             
             if choice == "0":
                 self.console.print("👋 До свидания!", style="yellow")
@@ -351,6 +379,8 @@ class AgentInterface:
             elif choice == "5":
                 self.show_tools_info()
             elif choice == "6":
+                self.clear_session_memory()
+            elif choice == "7":
                 self.display_status()
 
 
