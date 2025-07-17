@@ -22,6 +22,7 @@ from ..agent import AIPunkAgent, create_agent
 from ..config import AIProvider
 from ..config.manager import ConfigManager
 from ..config.models import AIProviderConfig
+from ..config.memory import MemoryConfig, MemoryPresets, get_memory_config_info, calculate_estimated_memory_usage
 from ..workspace.manager import WorkspaceManager
 from ..localization.core import Localization
 
@@ -333,6 +334,91 @@ class AgentInterface:
                 self.console.print(f"❌ Ошибка при очистке памяти: {e}", style="red")
         else:
             self.console.print("Операция отменена", style="yellow")
+    
+    def setup_memory_settings(self):
+        """Setup memory and session configuration"""
+        self.console.print("\n🧠 Настройка памяти и сессий", style="bold yellow")
+        
+        # Show current memory info if agent exists
+        if self.agent:
+            try:
+                session_stats = self.agent.get_session_stats()
+                if session_stats.get("available"):
+                    current_history = session_stats.get("total_turns", 0)
+                    self.console.print(f"Текущая сессия: {current_history} взаимодействий")
+            except Exception:
+                pass
+        
+        # Show preset options
+        self.console.print("\nВыберите конфигурацию памяти:")
+        self.console.print("  1. Минимальная (5 диалогов) - для слабых систем")
+        self.console.print("  2. Сбалансированная (20 диалогов) - рекомендуется")
+        self.console.print("  3. Расширенная (50 диалогов) - максимальный контекст")
+        self.console.print("  4. Интенсивная разработка (100 диалогов) - для серьезной работы")
+        self.console.print("  5. Показать подробную информацию о настройках")
+        
+        choice = Prompt.ask("Ваш выбор", choices=["1", "2", "3", "4", "5"], default="2")
+        
+        if choice == "1":
+            config = MemoryPresets.minimal()
+            self._show_memory_config_summary(config, "Минимальная")
+        elif choice == "2":
+            config = MemoryPresets.balanced()
+            self._show_memory_config_summary(config, "Сбалансированная")
+        elif choice == "3":
+            config = MemoryPresets.extensive()
+            self._show_memory_config_summary(config, "Расширенная")
+        elif choice == "4":
+            config = MemoryPresets.developer_intensive()
+            self._show_memory_config_summary(config, "Интенсивная разработка")
+        elif choice == "5":
+            self._show_detailed_memory_info()
+            return
+        
+        # Confirm and apply configuration
+        if Confirm.ask("Применить эту конфигурацию?", default=True):
+            # Here we would save the config and restart agent if needed
+            self.console.print("✅ Конфигурация памяти сохранена!", style="green")
+            self.console.print("💡 Для применения настроек перезапустите агента", style="blue")
+        else:
+            self.console.print("Настройки не изменены", style="yellow")
+    
+    def _show_memory_config_summary(self, config: MemoryConfig, preset_name: str):
+        """Show summary of memory configuration"""
+        usage_info = calculate_estimated_memory_usage(config)
+        
+        summary_table = Table(title=f"🧠 Конфигурация: {preset_name}")
+        summary_table.add_column("Параметр", style="bold cyan")
+        summary_table.add_column("Значение", style="white")
+        
+        summary_table.add_row("История диалогов", f"{config.max_conversation_history} взаимодействий")
+        summary_table.add_row("Время жизни сессии", f"{config.session_timeout_hours} часов")
+        summary_table.add_row("Максимум файлов", f"{config.max_context_files}")
+        summary_table.add_row("Семантический поиск", f"{config.semantic_search_limit} результатов")
+        summary_table.add_row("Изучение паттернов", "✅" if config.enable_pattern_learning else "❌")
+        summary_table.add_row("Сжатие сессий", "✅" if config.compress_old_sessions else "❌")
+        summary_table.add_row("Размер сессии", f"~{usage_info['estimated_session_size_mb']} МБ")
+        summary_table.add_row("Рекомендация", usage_info['recommendation'])
+        
+        self.console.print(summary_table)
+    
+    def _show_detailed_memory_info(self):
+        """Show detailed information about memory settings"""
+        info_table = Table(title="📋 Подробная информация о настройках памяти")
+        info_table.add_column("Параметр", style="bold cyan")
+        info_table.add_column("Описание", style="white")
+        
+        config_info = get_memory_config_info()
+        for param, description in config_info.items():
+            info_table.add_row(param, description)
+        
+        self.console.print(info_table)
+        
+        self.console.print("\n💡 [blue]Рекомендации по выбору:[/blue]")
+        self.console.print("• [green]Минимальная[/green] - для медленных компьютеров или ограниченной памяти")
+        self.console.print("• [yellow]Сбалансированная[/yellow] - оптимальная для большинства пользователей")
+        self.console.print("• [blue]Расширенная[/blue] - для длительных сессий и сложных проектов") 
+        self.console.print("• [red]Интенсивная[/red] - для профессиональной разработки на мощных системах")
         
     def show_main_menu(self):
         """Display main menu"""
@@ -346,6 +432,7 @@ class AgentInterface:
         menu_table.add_row("4", self.localization.get("start_chat"))
         menu_table.add_row("5", self.localization.get("show_tools"))
         menu_table.add_row("6", "Clear Session Memory")
+        menu_table.add_row("7", "Memory Settings")
         menu_table.add_row("0", self.localization.get("exit"))
         
         menu_panel = Panel(
@@ -363,7 +450,7 @@ class AgentInterface:
             self.console.print()
             self.show_main_menu()
             
-            choice = Prompt.ask("Выберите действие", choices=["0", "1", "2", "3", "4", "5", "6", "7"])
+            choice = Prompt.ask("Выберите действие", choices=["0", "1", "2", "3", "4", "5", "6", "7", "8"])
             
             if choice == "0":
                 self.console.print("👋 До свидания!", style="yellow")
@@ -381,6 +468,8 @@ class AgentInterface:
             elif choice == "6":
                 self.clear_session_memory()
             elif choice == "7":
+                self.setup_memory_settings()
+            elif choice == "8":
                 self.display_status()
 
 

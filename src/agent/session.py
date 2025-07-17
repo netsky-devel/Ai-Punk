@@ -15,8 +15,9 @@ class SessionManager:
     Solves the problem of losing context between messages
     """
     
-    def __init__(self, workspace_path: Optional[str] = None):
+    def __init__(self, workspace_path: Optional[str] = None, max_history: int = 20):
         self.workspace_path = workspace_path
+        self.max_history = max_history  # Configurable history size
         self.session_file = self._get_session_file_path()
         self.session_data = self._load_session()
         
@@ -96,9 +97,9 @@ class SessionManager:
         
         self.session_data["conversation_history"].append(turn)
         
-        # Keep only last 20 turns to avoid huge files
-        if len(self.session_data["conversation_history"]) > 20:
-            self.session_data["conversation_history"] = self.session_data["conversation_history"][-20:]
+        # Keep only last max_history turns to avoid huge files
+        if len(self.session_data["conversation_history"]) > self.max_history:
+            self.session_data["conversation_history"] = self.session_data["conversation_history"][-self.max_history:]
         
         self._save_session()
     
