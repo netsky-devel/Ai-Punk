@@ -199,6 +199,8 @@ class AgentInterface:
         
         # Save configuration
         set_ai_provider(provider, api_key, model)
+        # Reload configuration to update self.config
+        self.config = get_config()
         self.console.print(f"✅ AI провайдер {provider_name} настроен успешно!", style="green")
         
     def setup_workspace(self):
@@ -214,6 +216,9 @@ class AgentInterface:
         path = Prompt.ask("Введите путь к рабочей директории", default=".")
         
         if select_workspace(path):
+            # Reload workspace and config to update self.workspace and self.config
+            self.workspace = get_workspace()
+            self.config = get_config()
             self.console.print("✅ Рабочая директория установлена успешно!", style="green")
         else:
             self.console.print("❌ Ошибка при установке рабочей директории", style="red")
