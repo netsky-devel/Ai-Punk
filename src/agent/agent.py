@@ -18,6 +18,7 @@ from ..workspace import get_workspace
 from ..localization import get_localization, set_language_from_user_input
 from .transparency import TransparencyCallback
 from .langchain_tools import create_simple_langchain_tools, get_simple_tool_descriptions
+from ..tools.project_analyzer import ProjectAnalyzer
 
 
 class AIPunkAgent:
@@ -38,6 +39,9 @@ class AIPunkAgent:
         self.agent = self._create_agent()
         self.agent_executor = self._create_agent_executor()
         
+        # Auto-analyze project for better context understanding
+        self._auto_analyze_project()
+    
     def _create_llm(self):
         """Create LLM based on configuration"""
         if not self.config.ai_provider:
@@ -82,11 +86,11 @@ class AIPunkAgent:
         
         # Create custom prompt template
         prompt_template = f"""
-You are AI Punk Agent, an autonomous software development assistant.
+You are AI Punk Agent, an autonomous software development assistant with SEMANTIC UNDERSTANDING of codebases.
 
 {workspace_info}
 
-Your task is to help users with any programming tasks using available tools.
+Your task is to help users with any programming tasks using available tools. You have INTELLIGENT UNDERSTANDING of the project structure and can find code by meaning, not just text search.
 
 IMPORTANT PRINCIPLES:
 1. Always work only within the current working directory
@@ -96,6 +100,12 @@ IMPORTANT PRINCIPLES:
 5. Explain your thoughts and actions in clear language
 6. When errors occur, suggest solutions
 7. Always verify the results of your actions
+
+INTELLIGENT SEARCH CAPABILITIES:
+- Use 'semantic_search' for finding code by MEANING and FUNCTIONALITY
+- Use 'grep_search' only for exact text matches
+- semantic_search understands concepts like "authentication", "error handling", "database operations"
+- Always prefer semantic_search when user asks "where", "how", "find code that does X"
 
 LANGUAGE ADAPTATION:
 - Automatically detect the user's language from their input
@@ -109,6 +119,12 @@ PATH USAGE EXAMPLES:
 - list_directory with path "src" - show src folder
 - read_file with path "main.py" - read main.py file
 - read_file with path "src/config.py" - read file in subdirectory
+
+SEARCH STRATEGY:
+- For conceptual questions: Use semantic_search first (e.g., "where is user authentication?")
+- For exact text: Use grep_search (e.g., find "import pandas")
+- Read files that semantic_search identifies as relevant
+- Understand the project context before making changes
 
 AVAILABLE TOOLS:
 {{tools}}
@@ -150,6 +166,33 @@ Question: {{input}}
             handle_parsing_errors=True,
             return_intermediate_steps=True
         )
+    
+    def _auto_analyze_project(self):
+        """Automatically analyze project structure and create semantic index"""
+        try:
+            workspace_path = self.workspace.get_current_workspace()
+            if not workspace_path:
+                return
+                
+            self.console.print("🧠 [bold blue]Инициализирую умного агента...[/bold blue]")
+            self.console.print("📊 Анализирую проект для лучшего понимания контекста")
+            
+            # Create project analyzer
+            analyzer = ProjectAnalyzer(str(workspace_path))
+            
+            # Perform analysis (this also creates semantic index)
+            result = analyzer.execute()
+            
+            if result["success"] and "summary" in result:
+                self.console.print("\n✅ [bold green]Проект проанализирован![/bold green]")
+                self.console.print(result["summary"])
+                self.console.print("\n🚀 Агент готов к работе с полным пониманием проекта!\n")
+            else:
+                self.console.print("⚠️ [yellow]Анализ проекта завершился с ошибкой, но агент всё равно готов к работе[/yellow]")
+                
+        except Exception as e:
+            self.console.print(f"⚠️ [yellow]Ошибка автоанализа: {e}[/yellow]")
+            self.console.print("🤖 Агент готов к работе в базовом режиме")
     
     def execute_task(self, task: str) -> Dict[str, Any]:
         """
