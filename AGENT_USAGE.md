@@ -39,16 +39,22 @@ The agent understands natural language and can perform various programming tasks
 "Analyze the project structure"
 "What does this code do?"
 "Find all TODO comments"
+"Search for configuration files in the project"
+"Locate files containing authentication logic"
 
 # Code modification
 "Add error handling to main.py"
 "Refactor the database connection function"
 "Create a new configuration file"
+"Remove old backup files safely"
+"Find and update all import statements"
 
 # Project tasks
 "Set up a new Flask application"
 "Add unit tests for the user module"
 "Optimize the performance of the algorithm"
+"Search for performance bottlenecks in the code"
+"Clean up unused files and dependencies"
 ```
 
 ### 🧠 Agent Thinking
@@ -77,15 +83,18 @@ The project structure has been analyzed. This is a Python web application...
 ## 🛠️ Available Tools
 
 ### 📁 File Operations
-- **list_directory**: Shows directory contents
-- **read_file**: Reads file contents
-- **edit_file**: Modifies files with search and replace
+- **list_directory**: Shows directory contents with detailed file information
+- **read_file**: Reads file contents with support for partial reading and syntax highlighting
+- **edit_file**: Modifies files with advanced search and replace functionality
+- **delete_file**: Safe file deletion with validation and backup capabilities
+- **file_search**: Intelligent file search with relevance scoring and fuzzy matching
 
 ### 🔍 Search and Analysis
-- **grep_search**: Searches for text patterns in files
+- **grep_search**: Searches for text patterns in files with regex support
+- **codebase_search**: Semantic search for understanding code structure and finding relevant code
 
 ### 💻 System Operations
-- **run_terminal**: Executes terminal commands
+- **run_terminal**: Executes terminal commands in a secure, controlled environment
 
 ## 🔒 Security and Limitations
 
