@@ -24,6 +24,8 @@ from ..config.manager import ConfigManager
 from ..config.models import AIProviderConfig
 from ..config.memory import MemoryConfig, MemoryPresets, get_memory_config_info, calculate_estimated_memory_usage
 from ..workspace.manager import WorkspaceManager
+from ..workspace import select_workspace, get_workspace
+from ..config import get_config
 from ..localization.core import Localization
 
 

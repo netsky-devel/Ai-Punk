@@ -14,6 +14,7 @@ from rich.text import Text
 from rich.align import Align
 
 from ..localization.core import Localization
+from ..localization import t
 
 class TransparencyCallback(BaseCallbackHandler):
     """Callback handler that provides full transparency into agent operations"""

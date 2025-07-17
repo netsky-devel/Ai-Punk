@@ -13,6 +13,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 from ..workspace.manager import WorkspaceManager
+from ..workspace import get_current_workspace
 from ..config.manager import ConfigManager
 
 console = Console()
