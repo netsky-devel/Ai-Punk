@@ -48,6 +48,7 @@ yarn-error.log*
 
 # AI Punk specific
 .ai-punk/
+.ai-punk-cache/
 *.index
 *.faiss
 

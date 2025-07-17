@@ -10,6 +10,7 @@ from .filesystem import SimpleListDirLangChain, SimpleReadFileLangChain, SimpleE
 from .search import SimpleGrepLangChain
 from .terminal import SimpleTerminalLangChain
 from .semantic import SimpleSemanticSearchLangChain
+from .file_ops import SimpleFileSearchLangChain, SimpleDeleteFileLangChain
 
 
 def create_simple_langchain_tools() -> List[BaseTool]:
@@ -24,7 +25,9 @@ def create_simple_langchain_tools() -> List[BaseTool]:
         SimpleEditFileLangChain(workspace_path),
         SimpleGrepLangChain(workspace_path),
         SimpleTerminalLangChain(workspace_path),
-        SimpleSemanticSearchLangChain(workspace_path)
+        SimpleSemanticSearchLangChain(workspace_path),
+        SimpleFileSearchLangChain(workspace_path),
+        SimpleDeleteFileLangChain(workspace_path)
     ]
 
 
@@ -36,6 +39,8 @@ def get_simple_tool_descriptions() -> str:
         "edit_file: Редактирует файл с заменой строк",
         "grep_search: Ищет текст в файлах проекта",
         "run_terminal: Выполняет команды в терминале",
-        "semantic_search: Семантический поиск по кодовой базе по смыслу и функциональности"
+        "semantic_search: Семантический поиск по кодовой базе по смыслу и функциональности",
+        "file_search: Быстрый поиск файлов по имени или части пути",
+        "delete_file: Безопасное удаление файлов с созданием резервных копий"
     ]
     return "\n".join(descriptions) 

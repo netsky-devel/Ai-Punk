@@ -10,6 +10,8 @@ from .read_file import ReadFileTool
 from .edit_file import EditFileTool
 from .grep import GrepTool
 from .terminal import TerminalTool
+from .file_search import FileSearchTool
+from .delete_file import DeleteFileTool
 
 __all__ = [
     'FileEntry',
@@ -19,5 +21,7 @@ __all__ = [
     'ReadFileTool',
     'EditFileTool', 
     'GrepTool',
-    'TerminalTool'
+    'TerminalTool',
+    'FileSearchTool',
+    'DeleteFileTool'
 ] 
