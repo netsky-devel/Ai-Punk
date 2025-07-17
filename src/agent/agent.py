@@ -210,7 +210,7 @@ Question: {{input}}
     
     def execute_task(self, task: str) -> Dict[str, Any]:
         """
-        Execute a task using the agent
+        Execute a task using the agent with Smart Context Manager enhancement
         
         Args:
             task: The task description from the user
@@ -218,6 +218,16 @@ Question: {{input}}
         Returns:
             Dictionary with execution results and metadata
         """
+        # Try to use context-enhanced execution if possible
+        try:
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(self.execute_task_with_context(task))
+        except Exception:
+            # Fallback to basic execution if context fails
+            return self._execute_task_basic(task)
+    
+    def _execute_task_basic(self, task: str) -> Dict[str, Any]:
+        """Basic task execution without context enhancement"""
         # Display welcome message and task header
         self.transparency_callback.display_welcome()
         self.transparency_callback.display_task_header(task)
@@ -360,8 +370,8 @@ Question: {{input}}
             relevant_files = [match["file_path"] for match in context_suggestions["semantic_matches"][:2]]
             enhanced_task += f"\n\nContext: Consider these relevant files: {', '.join(relevant_files)}"
         
-        # Execute original task
-        result = self.execute_task(enhanced_task)
+        # Execute original task using basic method to avoid recursion
+        result = self._execute_task_basic(enhanced_task)
         
         # Track execution with context manager
         if context_available:
