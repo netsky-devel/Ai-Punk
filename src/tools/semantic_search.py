@@ -266,10 +266,13 @@ class SemanticSearchTool(BaseTool):
             # Search
             scores, indices = self.index.search(query_embedding, limit)
             
+            # Debug information
+            print(f"🔍 Debug: Found {len(scores[0])} results, top scores: {scores[0][:3]}")
+            
             # Format results
             results = []
             for score, idx in zip(scores[0], indices[0]):
-                if idx >= 0 and score > 0.3:  # Minimum similarity threshold
+                if idx >= 0:  # Убираю порог схожести для тестирования
                     chunk = self.chunks[idx]
                     results.append({
                         "file": chunk.file_path,
@@ -279,10 +282,12 @@ class SemanticSearchTool(BaseTool):
                         "type": chunk.chunk_type
                     })
             
-            return self._format_success(
-                f"Найдено {len(results)} релевантных фрагментов",
-                {"query": query, "results": results, "total_found": len(results)}
-            )
+            # Возвращаем результаты на верхнем уровне для совместимости
+            result = self._format_success(f"Найдено {len(results)} релевантных фрагментов")
+            result["query"] = query
+            result["results"] = results
+            result["total_found"] = len(results)
+            return result
             
         except Exception as e:
             return self._format_error(f"Ошибка поиска: {str(e)}")
