@@ -66,7 +66,7 @@ class ConfigManager:
         if 'agent' in data:
             agent_data = data['agent']
             config.agent = AgentConfig(
-                max_iterations=agent_data.get('max_iterations', 10),
+                max_iterations=agent_data.get('max_iterations', 50),
                 verbose=agent_data.get('verbose', True),
                 show_full_process=agent_data.get('show_full_process', True),
                 auto_save=agent_data.get('auto_save', True)

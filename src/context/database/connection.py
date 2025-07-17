@@ -60,21 +60,26 @@ class SurrealConnection:
         try:
             # Try primary URL first
             if primary_url:
-                async with Surreal(primary_url) as db:
-                    await db.use(self.namespace, self.database)
-                    result = await db.query(query, params or {})
-                    return result
+                db = Surreal(primary_url)
+                await db.connect()
+                await db.use(self.namespace, self.database)
+                result = await db.query(query, params or {})
+                await db.close()
+                return result
         except Exception as e:
-            print(f"Primary query execution failed: {e}")
+            # Silent fallback - don't print DB errors to avoid spam
+            pass
         
         try:
             # Fallback to memory
-            async with Surreal(fallback_url) as db:
-                await db.use(self.namespace, self.database)
-                result = await db.query(query, params or {})
-                return result
+            db = Surreal(fallback_url)
+            await db.connect()
+            await db.use(self.namespace, self.database)
+            result = await db.query(query, params or {})
+            await db.close()
+            return result
         except Exception as e:
-            print(f"Fallback query execution failed: {e}")
+            # Silent fallback - return empty result
             return []
     
     async def create_record(self, table: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -85,20 +90,25 @@ class SurrealConnection:
         
         try:
             if primary_url:
-                async with Surreal(primary_url) as db:
-                    await db.use(self.namespace, self.database)
-                    result = await db.create(table, data)
-                    return result[0] if result else {}
-        except Exception as e:
-            print(f"Primary record creation failed: {e}")
-        
-        try:
-            async with Surreal(fallback_url) as db:
+                db = Surreal(primary_url)
+                await db.connect()
                 await db.use(self.namespace, self.database)
                 result = await db.create(table, data)
+                await db.close()
                 return result[0] if result else {}
         except Exception as e:
-            print(f"Fallback record creation failed: {e}")
+            # Silent fallback - don't print DB errors
+            pass
+        
+        try:
+            db = Surreal(fallback_url)
+            await db.connect()
+            await db.use(self.namespace, self.database)
+            result = await db.create(table, data)
+            await db.close()
+            return result[0] if result else {}
+        except Exception as e:
+            # Silent fallback - return empty result
             return {}
     
     async def select_records(self, table: str, condition: Optional[str] = None) -> List[Dict[str, Any]]:
@@ -118,20 +128,25 @@ class SurrealConnection:
         
         try:
             if primary_url:
-                async with Surreal(primary_url) as db:
-                    await db.use(self.namespace, self.database)
-                    result = await db.update(record_id, data)
-                    return result[0] if result else {}
-        except Exception as e:
-            print(f"Primary record update failed: {e}")
-        
-        try:
-            async with Surreal(fallback_url) as db:
+                db = Surreal(primary_url)
+                await db.connect()
                 await db.use(self.namespace, self.database)
                 result = await db.update(record_id, data)
+                await db.close()
                 return result[0] if result else {}
         except Exception as e:
-            print(f"Fallback record update failed: {e}")
+            # Silent fallback - don't print DB errors
+            pass
+        
+        try:
+            db = Surreal(fallback_url)
+            await db.connect()
+            await db.use(self.namespace, self.database)
+            result = await db.update(record_id, data)
+            await db.close()
+            return result[0] if result else {}
+        except Exception as e:
+            # Silent fallback - return empty result
             return {}
     
     async def health_check(self) -> bool:

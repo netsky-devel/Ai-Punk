@@ -28,7 +28,7 @@ class AIProviderConfig:
 @dataclass
 class AgentConfig:
     """Agent behavior configuration"""
-    max_iterations: int = 10
+    max_iterations: int = 50
     verbose: bool = True
     show_full_process: bool = True
     auto_save: bool = True

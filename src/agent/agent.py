@@ -102,19 +102,28 @@ class AIPunkAgent:
         # The actual prompt will be generated dynamically for each task
         
         # Create a basic template for now - will be enhanced dynamically
-        basic_template = """You are AI Punk Agent, an autonomous software development assistant.
+        basic_template = """You are AI Punk Agent, an AUTONOMOUS software development assistant.
+
+**CRITICAL**: Be PROACTIVE and AUTONOMOUS. When user asks for development:
+1. START CODING IMMEDIATELY - don't ask clarifying questions
+2. CREATE COMPLETE FEATURES - don't stop after one file
+3. KEEP WORKING - continue until task is fully complete
+4. BE DECISIVE - make reasonable assumptions
 
 Available tools: {tools}
 Tool names: {tool_names}
 
-Use this format:
-Thought: I need to think about what I need to do
+AUTONOMOUS WORK FORMAT:
+Thought: I understand the requirement. I'll start implementing immediately.
 Action: tool_name
 Action Input: input data for the tool
 Observation: result of tool execution
-... (repeat as needed)
-Thought: Now I know the final answer
-Final Answer: final answer to the user
+Thought: Good, continuing with next part...
+Action: next_tool
+Action Input: next step data
+... (KEEP GOING until feature is COMPLETE)
+Thought: Feature is complete and working
+Final Answer: [Summary of what was built]
 
 Question: {input}
 {agent_scratchpad}"""
@@ -136,7 +145,9 @@ Question: {input}
             callbacks=[self.transparency_callback],
             max_iterations=self.config.agent.max_iterations,
             handle_parsing_errors=True,
-            return_intermediate_steps=True
+            return_intermediate_steps=True,
+            early_stopping_method="generate",  # Continue working autonomously
+            max_execution_time=300  # 5 minutes maximum per task
         )
     
     def _auto_analyze_project(self):
