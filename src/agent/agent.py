@@ -1,9 +1,12 @@
 """
 AI Punk Agent
 Main agent class using LangChain ReAct pattern with full transparency
+Enhanced with Smart Context Manager for intelligent workflow assistance
 """
 
 import os
+import asyncio
+import time
 from typing import Optional, Dict, Any, List
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
@@ -20,6 +23,7 @@ from ..localization.core import Localization
 from .transparency import TransparencyCallback
 from .wrappers.factory import create_simple_langchain_tools, get_simple_tool_descriptions
 from ..tools.project_analyzer import ProjectAnalyzer
+from ..context.manager import SmartContextManager
 
 
 class AIPunkAgent:
@@ -36,6 +40,10 @@ class AIPunkAgent:
         self.localization = Localization()
         self.transparency_callback = TransparencyCallback(self.console)
         
+        # Smart Context Manager for intelligent assistance
+        self.context_manager = None
+        self._context_initialized = False
+        
         # Initialize LLM and agent
         self.llm = self._create_llm()
         self.tools = create_simple_langchain_tools()
@@ -44,6 +52,9 @@ class AIPunkAgent:
         
         # Auto-analyze project for better context understanding
         self._auto_analyze_project()
+        
+        # Initialize Smart Context Manager (async)
+        self._initialize_context_manager()
     
     def _create_llm(self):
         """Create LLM based on configuration"""
@@ -288,6 +299,122 @@ Question: {{input}}
                     "args_schema": tool.args_schema.schema() if tool.args_schema else None
                 }
         return None
+    
+    def _initialize_context_manager(self):
+        """Initialize Smart Context Manager asynchronously"""
+        try:
+            workspace_path = self.workspace.get_current_workspace()
+            if workspace_path:
+                self.context_manager = SmartContextManager(self.workspace)
+                self.console.print("🧠 [blue]Smart Context Manager готов к инициализации[/blue]")
+            else:
+                self.console.print("⚠️ [yellow]Workspace не выбран - Smart Context Manager недоступен[/yellow]")
+        except Exception as e:
+            self.console.print(f"⚠️ [yellow]Ошибка инициализации Smart Context Manager: {e}[/yellow]")
+    
+    async def _ensure_context_initialized(self) -> bool:
+        """Ensure context manager is initialized"""
+        if not self.context_manager:
+            return False
+            
+        if not self._context_initialized:
+            self.console.print("🧠 [blue]Инициализирую Smart Context Manager...[/blue]")
+            result = await self.context_manager.initialize()
+            
+            if result["success"]:
+                self._context_initialized = True
+                self.console.print("✅ [green]Smart Context Manager активирован![/green]")
+                return True
+            else:
+                self.console.print(f"❌ [red]Ошибка инициализации: {result.get('error', 'Unknown error')}[/red]")
+                return False
+        
+        return True
+    
+    async def execute_task_with_context(self, task: str) -> Dict[str, Any]:
+        """Execute task with Smart Context Manager enhancement"""
+        start_time = time.time()
+        
+        # Initialize context if available
+        context_available = await self._ensure_context_initialized()
+        
+        # Get context suggestions if available
+        context_suggestions = {}
+        if context_available:
+            try:
+                context_suggestions = await self.context_manager.suggest_next_actions(task)
+                
+                # Display context insights
+                if context_suggestions.get("suggested_next_steps"):
+                    self.console.print("\n💡 [blue]Smart Context Suggestions:[/blue]")
+                    for suggestion in context_suggestions["suggested_next_steps"]:
+                        self.console.print(f"   • {suggestion}")
+                    self.console.print()
+                
+            except Exception as e:
+                self.console.print(f"⚠️ [yellow]Context analysis error: {e}[/yellow]")
+        
+        # Enhanced prompt with context
+        enhanced_task = task
+        if context_suggestions.get("semantic_matches"):
+            relevant_files = [match["file_path"] for match in context_suggestions["semantic_matches"][:2]]
+            enhanced_task += f"\n\nContext: Consider these relevant files: {', '.join(relevant_files)}"
+        
+        # Execute original task
+        result = self.execute_task(enhanced_task)
+        
+        # Track execution with context manager
+        if context_available:
+            try:
+                execution_time = time.time() - start_time
+                await self.context_manager.track_action(
+                    tool_name="agent_execution",
+                    input_data={"task": task, "enhanced": bool(context_suggestions)},
+                    result={"success": result["success"]},
+                    execution_time=execution_time
+                )
+            except Exception as e:
+                self.console.print(f"⚠️ [yellow]Context tracking error: {e}[/yellow]")
+        
+        return result
+    
+    async def add_file_to_context(self, file_path: str, content: str = None):
+        """Add file content to context for semantic search"""
+        if not await self._ensure_context_initialized():
+            return
+        
+        try:
+            # Track file access
+            file_size = 0
+            if content is None:
+                # Read file content if not provided
+                full_path = self.workspace.get_current_workspace() / file_path
+                if full_path.exists():
+                    with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        content = f.read()
+                    file_size = full_path.stat().st_size
+            
+            if content:
+                # Add to context
+                await self.context_manager.track_file_access(file_path, file_size)
+                await self.context_manager.add_code_embedding(file_path, content)
+                self.console.print(f"📝 [green]Added {file_path} to context[/green]")
+        
+        except Exception as e:
+            self.console.print(f"❌ [red]Failed to add {file_path} to context: {e}[/red]")
+    
+    async def get_context_status(self) -> Dict[str, Any]:
+        """Get Smart Context Manager status"""
+        if not self.context_manager:
+            return {"available": False, "reason": "Not initialized"}
+        
+        if not self._context_initialized:
+            return {"available": False, "reason": "Not initialized"}
+        
+        try:
+            return await self.context_manager.get_status()
+        except Exception as e:
+            return {"available": False, "error": str(e)}
 
 
 def create_agent(console: Optional[Console] = None) -> AIPunkAgent:

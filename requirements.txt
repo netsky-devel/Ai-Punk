@@ -10,6 +10,9 @@ langchain-community>=0.3.0
 # Agent Framework
 langgraph>=0.2.74
 
+# Smart Context Manager - SurrealDB Multi-model Database
+surrealdb>=1.5.0
+
 # Vector Search & Embeddings
 faiss-cpu>=1.8.0
 sentence-transformers>=3.0.0
