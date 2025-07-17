@@ -10,7 +10,7 @@ from rich.panel import Panel
 from rich.text import Text
 from pathlib import Path
 
-from ..workspace import resolve_workspace_path, get_current_workspace
+from ..workspace.manager import WorkspaceManager
 
 console = Console()
 
@@ -29,13 +29,15 @@ class BaseTool(ABC):
     def _resolve_path(self, path: str) -> Path:
         """Resolve path within workspace with security checks"""
         try:
-            return resolve_workspace_path(path)
+            workspace_manager = WorkspaceManager()
+            return workspace_manager.resolve_path(path)
         except ValueError as e:
             raise ValueError(f"🚫 Путь недоступен: {e}")
     
     def _check_workspace(self) -> Path:
         """Check if workspace is selected"""
-        workspace = get_current_workspace()
+        workspace_manager = WorkspaceManager()
+        workspace = workspace_manager.get_current_workspace()
         if not workspace:
             raise ValueError("🚫 Рабочая директория не выбрана")
         return workspace

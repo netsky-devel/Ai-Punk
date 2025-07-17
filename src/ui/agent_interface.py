@@ -19,9 +19,11 @@ from rich.live import Live
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from ..agent import AIPunkAgent, create_agent
-from ..config import get_config, AIProvider, set_ai_provider
-from ..workspace import get_workspace, select_workspace
-from ..localization import get_localization, t
+from ..config import AIProvider
+from ..config.manager import ConfigManager
+from ..config.models import AIProviderConfig
+from ..workspace.manager import WorkspaceManager
+from ..localization.core import Localization
 
 
 class AgentInterface:
@@ -30,19 +32,21 @@ class AgentInterface:
     def __init__(self):
         self.console = Console()
         self.agent: Optional[AIPunkAgent] = None
-        self.config = get_config()
-        self.workspace = get_workspace()
+        self.config_manager = ConfigManager()
+        self.config = self.config_manager.load_config()
+        self.workspace = WorkspaceManager()
+        self.localization = Localization()
         
     def display_banner(self):
         """Display welcome banner"""
         banner_text = Text()
-        banner_text.append(t("welcome_banner"), style="bold bright_blue")
+        banner_text.append(self.localization.get("welcome_banner"), style="bold bright_blue")
         banner_text.append("\n", style="white")
-        banner_text.append(t("welcome_subtitle"), style="dim")
+        banner_text.append(self.localization.get("welcome_subtitle"), style="dim")
         
         banner_panel = Panel(
             Align.center(banner_text),
-            title=t("welcome_title"),
+            title=self.localization.get("welcome_title"),
             border_style="bright_blue",
             padding=(1, 2)
         )
@@ -71,9 +75,9 @@ class AgentInterface:
             
         # Agent status
         if self.agent:
-            status_table.add_row("⚡ Agent:", t("agent_ready"))
+            status_table.add_row("⚡ Agent:", self.localization.get("agent_ready"))
         else:
-            status_table.add_row("⚡ Agent:", t("agent_not_initialized"))
+            status_table.add_row("⚡ Agent:", self.localization.get("agent_not_initialized"))
             
         status_panel = Panel(
             status_table,
@@ -198,9 +202,14 @@ class AgentInterface:
             model = Prompt.ask("Введите название модели")
         
         # Save configuration
-        set_ai_provider(provider, api_key, model)
+        self.config.ai_provider = AIProviderConfig(
+            provider=provider,
+            api_key=api_key,
+            model=model
+        )
+        self.config_manager.save_config(self.config)
         # Reload configuration to update self.config
-        self.config = get_config()
+        self.config = self.config_manager.load_config()
         self.console.print(f"✅ AI провайдер {provider_name} настроен успешно!", style="green")
         
     def setup_workspace(self):
@@ -304,16 +313,16 @@ class AgentInterface:
         menu_table.add_column("Option", style="bold cyan")
         menu_table.add_column("Description", style="white")
         
-        menu_table.add_row("1", t("setup_ai_provider"))
-        menu_table.add_row("2", t("select_workspace"))
-        menu_table.add_row("3", t("initialize_agent"))
-        menu_table.add_row("4", t("start_chat"))
-        menu_table.add_row("5", t("show_tools"))
-        menu_table.add_row("0", t("exit"))
+        menu_table.add_row("1", self.localization.get("setup_ai_provider"))
+        menu_table.add_row("2", self.localization.get("select_workspace"))
+        menu_table.add_row("3", self.localization.get("initialize_agent"))
+        menu_table.add_row("4", self.localization.get("start_chat"))
+        menu_table.add_row("5", self.localization.get("show_tools"))
+        menu_table.add_row("0", self.localization.get("exit"))
         
         menu_panel = Panel(
             menu_table,
-            title=t("main_menu"),
+            title=self.localization.get("main_menu"),
             border_style="cyan"
         )
         self.console.print(menu_panel)

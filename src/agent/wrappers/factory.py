@@ -14,9 +14,9 @@ from .semantic import SimpleSemanticSearchLangChain
 
 def create_simple_langchain_tools() -> List[BaseTool]:
     """Создает список простых LangChain инструментов для агента"""
-    from ...workspace import get_workspace
-    workspace = get_workspace()
-    workspace_path = str(workspace.current_path) if workspace.current_path else "."
+    from ...workspace.manager import WorkspaceManager
+    workspace_manager = WorkspaceManager()
+    workspace_path = str(workspace_manager.current_path) if workspace_manager.current_path else "."
     
     return [
         SimpleListDirLangChain(workspace_path),

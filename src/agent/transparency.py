@@ -13,7 +13,7 @@ from rich.table import Table
 from rich.text import Text
 from rich.align import Align
 
-from ..localization import get_localization, t
+from ..localization.core import Localization
 
 class TransparencyCallback(BaseCallbackHandler):
     """Callback handler that provides full transparency into agent operations"""
@@ -22,7 +22,7 @@ class TransparencyCallback(BaseCallbackHandler):
         self.console = console or Console()
         self.step_count = 0
         self.start_time = None
-        self.localization = get_localization()
+        self.localization = Localization()
         
     def on_agent_action(self, action: AgentAction, **kwargs: Any) -> Any:
         """Called when agent takes an action"""

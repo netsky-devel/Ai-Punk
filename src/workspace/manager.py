@@ -7,7 +7,8 @@ import os
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
-from ..config import get_config, set_workspace
+from ..config.manager import ConfigManager
+from ..config.models import AppConfig
 
 
 class WorkspaceManager:
@@ -19,7 +20,8 @@ class WorkspaceManager:
     
     def _load_workspace(self):
         """Load workspace from config"""
-        config = get_config()
+        config_manager = ConfigManager()
+        config = config_manager.load_config()
         if config.workspace_path:
             self.current_path = Path(config.workspace_path)
     
@@ -37,7 +39,10 @@ class WorkspaceManager:
                 return False
                 
             self.current_path = workspace_path
-            set_workspace(str(workspace_path))
+            config_manager = ConfigManager()
+            config = config_manager.load_config()
+            config.workspace_path = os.path.abspath(str(workspace_path))
+            config_manager.save_config(config)
             print(f"✅ Рабочая директория установлена: {workspace_path}")
             return True
             

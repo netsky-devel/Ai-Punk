@@ -13,11 +13,12 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_anthropic import ChatAnthropic
 from rich.console import Console
 
-from ..config import get_config, AIProvider
-from ..workspace import get_workspace
-from ..localization import get_localization, set_language_from_user_input
+from ..config.manager import ConfigManager
+from ..config.models import AIProvider
+from ..workspace.manager import WorkspaceManager
+from ..localization.core import Localization
 from .transparency import TransparencyCallback
-from .langchain_tools import create_simple_langchain_tools, get_simple_tool_descriptions
+from .wrappers.factory import create_simple_langchain_tools, get_simple_tool_descriptions
 from ..tools.project_analyzer import ProjectAnalyzer
 
 
@@ -29,8 +30,10 @@ class AIPunkAgent:
     
     def __init__(self, console: Optional[Console] = None):
         self.console = console or Console()
-        self.config = get_config()
-        self.workspace = get_workspace()
+        self.config_manager = ConfigManager()
+        self.config = self.config_manager.load_config()
+        self.workspace = WorkspaceManager()
+        self.localization = Localization()
         self.transparency_callback = TransparencyCallback(self.console)
         
         # Initialize LLM and agent
@@ -249,7 +252,7 @@ Question: {{input}}
             Agent response
         """
         # Set language based on user input
-        set_language_from_user_input(message)
+        self.localization.set_language_from_text(message)
         
         result = self.execute_task(message)
         

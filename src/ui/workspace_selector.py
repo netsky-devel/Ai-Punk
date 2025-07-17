@@ -12,8 +12,8 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
 
-from ..workspace import get_workspace, select_workspace, get_current_workspace
-from ..config import get_config
+from ..workspace.manager import WorkspaceManager
+from ..config.manager import ConfigManager
 
 console = Console()
 
@@ -21,11 +21,11 @@ class WorkspaceSelector:
     """Simple interface for workspace selection"""
     
     def __init__(self):
-        self.workspace_manager = get_workspace()
+        self.workspace_manager = WorkspaceManager()
     
     def show_current_workspace(self):
         """Display current workspace information"""
-        current = get_current_workspace()
+        current = self.workspace_manager.get_current_workspace()
         
         if not current:
             console.print("❌ Рабочая директория не выбрана", style="red")
@@ -57,7 +57,7 @@ class WorkspaceSelector:
         ))
         
         # Show current workspace if exists
-        current = get_current_workspace()
+        current = self.workspace_manager.get_current_workspace()
         if current:
             console.print(f"\n📁 Текущая рабочая директория: [green]{current}[/green]")
             
@@ -89,7 +89,7 @@ class WorkspaceSelector:
                 path = os.path.expanduser(path)
             
             # Try to select workspace
-            if select_workspace(path):
+                            if self.workspace_manager.select_workspace(path):
                 self.show_current_workspace()
                 return True
             else:
@@ -125,7 +125,7 @@ class WorkspaceSelector:
         
         if choice.isdigit() and 1 <= int(choice) <= len(options):
             selected_path = options[int(choice) - 1][2]
-            return select_workspace(selected_path)
+            return self.workspace_manager.select_workspace(selected_path)
         
         return False
     
